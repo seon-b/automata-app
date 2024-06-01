@@ -6,7 +6,7 @@ class State {
       nextState: null,
       previousState: null,
       nextTransitionValue: undefined,
-      previousTransitionalValue: undefined,
+      previousTransitionValue: undefined,
     };
   }
 }
@@ -48,5 +48,30 @@ export default class DFA {
       currentState = currentState.transitionArrow.nextState;
     }
     return listOfStates;
+  }
+
+  findState(stateName) {
+    if (!this.startState) return undefined;
+
+    let currentState = this.startState;
+
+    while (currentState !== null) {
+      if (currentState.name === stateName) {
+        return currentState;
+      }
+      currentState = currentState.transitionArrow.nextState;
+    }
+
+    return undefined;
+  }
+
+  setNextTransitionValue(value, stateName) {
+    let state = this.findState(stateName);
+    state.transitionArrow.nextTransitionValue = value;
+  }
+
+  setPreviousTransitionValue(value, stateName) {
+    let state = this.findState(stateName);
+    state.transitionArrow.previousTransitionValue = value;
   }
 }
