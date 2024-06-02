@@ -53,16 +53,51 @@ export default class DFA {
   findState(stateName) {
     if (!this.startState) return undefined;
 
+    let index = 0;
+
     let currentState = this.startState;
 
     while (currentState !== null) {
       if (currentState.name === stateName) {
-        return currentState;
+        return index;
       }
       currentState = currentState.transitionArrow.nextState;
+      index++;
     }
 
-    return undefined;
+    return -1;
+  }
+
+  getState(index) {
+    if (index === -1 || index > this.length) {
+      return undefined;
+    } else {
+      let currentState = this.startState;
+
+      for (let i = 0; i < index; i++) {
+        currentState = currentState.transitionArrow.nextState;
+      }
+
+      return currentState;
+    }
+  }
+
+  removeNextTransitionValue(stateName) {
+    let state = this.findState(stateName);
+    state.transitionArrow.nextTransitionValue = undefined;
+  }
+
+  removePreviousTransitionValue(stateName) {
+    let state = this.findState(stateName);
+    state.transitionArrow.previousTransitionValue = undefined;
+  }
+
+  removeState(stateName) {
+    if (!this.startState) return null;
+
+    let index = this.findState(stateName);
+
+    if (index === 0) return this.unShift();
   }
 
   setNextTransitionValue(value, stateName) {
@@ -73,5 +108,39 @@ export default class DFA {
   setPreviousTransitionValue(value, stateName) {
     let state = this.findState(stateName);
     state.transitionArrow.previousTransitionValue = value;
+  }
+
+  pop() {
+    if (!this.startState) return null;
+    if (this.startState.transitionArrow.nextState === null) {
+      return this.unShift();
+    }
+
+    let currentState = this.getState(this.length - 2);
+    this.lastState = currentState;
+    currentState = currentState.transitionArrow.nextState;
+    this.lastState.transitionArrow.nextState = null;
+    this.length--;
+    return currentState;
+  }
+
+  unShift() {
+    if (!this.startState) return null;
+
+    if (this.startState.transitionArrow.nextState === null) {
+      let currentState = this.startState;
+      this.startState = null;
+      this.lastState = null;
+      this.length--;
+
+      return currentState;
+    } else {
+      let currentState = this.startState;
+      this.startState = this.startState.transitionArrow.nextState;
+      currentState.transitionArrow.nextState = null;
+      this.length--;
+
+      return currentState;
+    }
   }
 }
