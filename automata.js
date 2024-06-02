@@ -96,8 +96,20 @@ export default class DFA {
     if (!this.startState) return null;
 
     let index = this.findState(stateName);
-
     if (index === 0) return this.unShift();
+
+    if (index === this.length - 1) {
+      return this.pop();
+    } else {
+      let stateToBeRomoved = this.getState(this.findState(stateName));
+      let previousState = this.getState(this.findState(stateName) - 1);
+
+      previousState.transitionArrow.nextState =
+        stateToBeRomoved.transitionArrow.nextState;
+      stateToBeRomoved.transitionArrow.nextState = null;
+      this.length--;
+      return stateToBeRomoved;
+    }
   }
 
   setNextTransitionValue(value, stateName) {
