@@ -11,7 +11,7 @@ class State {
   }
 }
 
-export default class DFA {
+export default class FiniteAutomata {
   constructor(name = "undefined") {
     let newState = new State(name);
     this.startState = newState;
