@@ -15,6 +15,7 @@ export class AutomataGraphics {
   ) {
     this.context.beginPath();
     this.context.arc(xCoordinate, yCoordinate, 25, 0, Math.PI * 2, false);
+    this.context.lineTo(xCoordinate * 2, 50);
     this.context.stroke();
   }
 }

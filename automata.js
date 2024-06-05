@@ -12,11 +12,12 @@ class State {
 }
 
 export default class FiniteAutomata {
-  constructor(name = "undefined") {
+  constructor(name = "undefined", automataType = "DFA") {
     let newState = new State(name);
     this.startState = newState;
     this.lastState = newState;
     this.length = 1;
+    this.automataType = automataType;
     return this;
   }
 
@@ -120,6 +121,30 @@ export default class FiniteAutomata {
   setPreviousTransitionValue(value, stateName) {
     let state = this.findState(stateName);
     state.transitionArrow.previousTransitionValue = value;
+  }
+
+  testString(inputString) {
+    if (inputString.length === 0) return "Error";
+    let symbolsArray = [];
+    let currentStates = this.displayStates();
+
+    for (let i = 0; i < inputString.length; i++) {
+      symbolsArray.push(inputString[i]);
+    }
+
+    symbolsArray.reverse();
+
+    for (let j = 0; j < currentStates.length; j++) {
+      if (
+        symbolsArray[j] === currentStates[j].transitionArrow.nextTransitionValue
+      ) {
+        symbolsArray.pop();
+      } else {
+        return false;
+      }
+    }
+
+    return symbolsArray.length === 0;
   }
 
   pop() {
