@@ -37,7 +37,7 @@ export default class FiniteAutomata {
     return this;
   }
 
-  displayStates() {
+  getAllStates() {
     if (!this.startState) return "No Data";
 
     let listOfStates = [];
@@ -128,7 +128,7 @@ export default class FiniteAutomata {
   testString(inputString) {
     if (inputString.length === 0) return "Error";
     let symbolsArray = [];
-    let currentStates = this.displayStates();
+    let currentStates = this.getAllStates();
 
     for (let i = 0; i < inputString.length; i++) {
       symbolsArray.push(inputString[i]);
