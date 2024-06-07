@@ -114,12 +114,14 @@ export default class FiniteAutomata {
   }
 
   setNextTransitionValue(value, stateName) {
-    let state = this.findState(stateName);
+    let index = this.findState(stateName);
+    let state = this.getState(index);
     state.transitionArrow.nextTransitionValue = value;
   }
 
   setPreviousTransitionValue(value, stateName) {
-    let state = this.findState(stateName);
+    let index = this.findState(stateName);
+    let state = this.getState(index);
     state.transitionArrow.previousTransitionValue = value;
   }
 
