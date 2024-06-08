@@ -4,8 +4,10 @@ class State {
     this.type = type;
     this.transitionArrow = {
       nextState: null,
+      presentState: null,
       previousState: null,
       nextTransitionValue: undefined,
+      presentTransitionValue: undefined,
       previousTransitionValue: undefined,
     };
   }
@@ -83,21 +85,41 @@ export default class FiniteAutomata {
     }
   }
 
+  isFinalState(stateName) {
+    let index = this.findState(stateName);
+    let currentState = this.getState(index);
+    return currentState.type === "final";
+  }
+
   removeNextTransitionValue(stateName) {
-    let state = this.findState(stateName);
+    let index = this.findState(stateName);
+    let state = this.getState(index);
     state.transitionArrow.nextTransitionValue = undefined;
   }
 
+  removePresentTransitionValue(stateName) {
+    let index = this.findState(stateName);
+    let state = this.getState(index);
+    state.transitionArrow.presentTransitionValue = undefined;
+  }
+
   removePreviousTransitionValue(stateName) {
-    let state = this.findState(stateName);
+    let index = this.findState(stateName);
+    let state = this.getState(index);
     state.transitionArrow.previousTransitionValue = undefined;
+  }
+
+  removePresentState(stateName) {
+    let index = this.findState(stateName);
+    let state = this.getState(index);
+    state.transitionArrow.presentState = null;
   }
 
   removeState(stateName) {
     if (!this.startState) return null;
 
     let index = this.findState(stateName);
-    if (index === 0) return this.unShift();
+    if (index === 0) return this.shift();
 
     if (index === this.length - 1) {
       return this.pop();
@@ -123,27 +145,44 @@ export default class FiniteAutomata {
     state.transitionArrow.nextTransitionValue = value;
   }
 
+  setPresentState(stateName) {
+    let index = this.findState(stateName);
+    let state = this.getState(index);
+    state.transitionArrow.presentState = state;
+  }
+
+  setPresentTransitionValue(value, stateName) {
+    let index = this.findState(stateName);
+    let state = this.getState(index);
+    if (state.transitionArrow.presentState === state) {
+      state.transitionArrow.presentTransitionValue = value;
+    } else {
+      throw new Error("Please set the present state");
+    }
+  }
+
   setPreviousTransitionValue(value, stateName) {
     let index = this.findState(stateName);
     let state = this.getState(index);
     state.transitionArrow.previousTransitionValue = value;
   }
 
-  testStringInput(inputString) {
+  parse(inputString) {
     if (inputString.length === 0) return "Error";
     let currentStates = this.getAllStates();
+    let currentStatePtr = currentStates[0];
     let i = 0;
 
     while (i < inputString.length) {
       if (
-        inputString[i] !== currentStates[i].transitionArrow.nextTransitionValue
+        inputString[i] === currentStates[i].transitionArrow.nextTransitionValue
       )
-        return false;
+        currentStatePtr = currentStates[i + 1];
 
       i++;
     }
 
-    return true;
+    return this.isFinalState(currentStatePtr.name);
   }
 
   toggleStateType(stateName) {
@@ -160,7 +199,7 @@ export default class FiniteAutomata {
   pop() {
     if (!this.startState) return null;
     if (this.startState.transitionArrow.nextState === null) {
-      return this.unShift();
+      return this.shift();
     }
 
     let currentState = this.getState(this.length - 2);
@@ -171,7 +210,7 @@ export default class FiniteAutomata {
     return currentState;
   }
 
-  Shift() {
+  shift() {
     if (!this.startState) return null;
 
     if (this.startState.transitionArrow.nextState === null) {
