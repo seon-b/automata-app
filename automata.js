@@ -113,6 +113,10 @@ export default class FiniteAutomata {
     }
   }
 
+  setAutomataType(automataType) {
+    this.automataType = automataType;
+  }
+
   setNextTransitionValue(value, stateName) {
     let index = this.findState(stateName);
     let state = this.getState(index);
@@ -125,28 +129,32 @@ export default class FiniteAutomata {
     state.transitionArrow.previousTransitionValue = value;
   }
 
-  testString(inputString) {
+  testStringInput(inputString) {
     if (inputString.length === 0) return "Error";
-    let symbolsArray = [];
     let currentStates = this.getAllStates();
+    let i = 0;
 
-    for (let i = 0; i < inputString.length; i++) {
-      symbolsArray.push(inputString[i]);
-    }
-
-    symbolsArray.reverse();
-
-    for (let j = 0; j < currentStates.length; j++) {
+    while (i < inputString.length) {
       if (
-        symbolsArray[j] === currentStates[j].transitionArrow.nextTransitionValue
-      ) {
-        symbolsArray.pop();
-      } else {
+        inputString[i] !== currentStates[i].transitionArrow.nextTransitionValue
+      )
         return false;
-      }
+
+      i++;
     }
 
-    return symbolsArray.length === 0;
+    return true;
+  }
+
+  toggleStateType(stateName) {
+    let index = this.findState(stateName);
+    let state = this.getState(index);
+
+    if (state.type === "non-final") {
+      state.type = "final";
+    } else {
+      state.type = "non-final";
+    }
   }
 
   pop() {
@@ -163,7 +171,7 @@ export default class FiniteAutomata {
     return currentState;
   }
 
-  unShift() {
+  Shift() {
     if (!this.startState) return null;
 
     if (this.startState.transitionArrow.nextState === null) {
