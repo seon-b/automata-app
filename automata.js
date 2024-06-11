@@ -139,6 +139,18 @@ export default class FiniteAutomata {
     this.automataType = automataType;
   }
 
+  setNextState(stateName, nextStateName) {
+    let currentStateIndex = this.findState(stateName);
+    let currentState = this.getState(currentStateIndex);
+    let nextStateIndex = this.findState(nextStateName);
+    let previousState = this.getState(nextStateIndex);
+
+    if (!(currentState && nextState))
+      throw new Error("One or both states do not exist");
+
+    currentState.transitionArrow.nextState = nextState;
+  }
+
   setNextTransitionValue(value, stateName) {
     let index = this.findState(stateName);
     let state = this.getState(index);
@@ -151,13 +163,25 @@ export default class FiniteAutomata {
     state.transitionArrow.presentState = state;
   }
 
+  setPreviousState(stateName, previousStateName) {
+    let currentStateIndex = this.findState(stateName);
+    let currentState = this.getState(currentStateIndex);
+    let previousStateIndex = this.findState(previousStateName);
+    let previousState = this.getState(previousStateIndex);
+
+    if (!(currentState && previousState))
+      throw new Error("One or both states do not exist");
+
+    currentState.transitionArrow.previousState = previousState;
+  }
+
   setPresentTransitionValue(value, stateName) {
     let index = this.findState(stateName);
     let state = this.getState(index);
     if (state.transitionArrow.presentState === state) {
       state.transitionArrow.presentTransitionValue = value;
     } else {
-      throw new Error("Please set the present state");
+      throw new Error("Present state does not exist");
     }
   }
 
