@@ -39,20 +39,6 @@ export default class FiniteAutomata {
     return this;
   }
 
-  getAllStates() {
-    if (!this.startState) return "No Data";
-
-    let listOfStates = [];
-
-    let currentState = this.startState;
-
-    while (currentState !== null) {
-      listOfStates.push(currentState);
-      currentState = currentState.transitionArrow.nextState;
-    }
-    return listOfStates;
-  }
-
   findState(stateName) {
     if (!this.startState) return undefined;
 
@@ -69,6 +55,39 @@ export default class FiniteAutomata {
     }
 
     return -1;
+  }
+
+  getAllStates() {
+    if (!this.startState) return "No Data";
+
+    let listOfStates = [];
+
+    let currentState = this.startState;
+
+    while (currentState !== null) {
+      listOfStates.push(currentState);
+      currentState = currentState.transitionArrow.nextState;
+    }
+    return listOfStates;
+  }
+
+  getAllTransitionValues(index) {
+    let currentState = this.getState(index);
+    let listOfTransitionValues = [];
+
+    listOfTransitionValues.push(
+      currentState.transitionArrow.nextTransitionValue
+    );
+
+    listOfTransitionValues.push(
+      currentState.transitionArrow.presentTransitionValue
+    );
+
+    listOfTransitionValues.push(
+      currentState.transitionArrow.previousTransitionValue
+    );
+
+    return listOfTransitionValues;
   }
 
   getState(index) {
@@ -193,18 +212,50 @@ export default class FiniteAutomata {
 
   parse(inputString) {
     if (inputString.length === 0) return "Error";
-    let currentStates = this.getAllStates();
-    let currentStatePtr = currentStates[0];
+    let currentStatePtr = this.startState;
+
     let i = 0;
-
-    while (i < inputString.length) {
-      if (
-        inputString[i] === currentStates[i].transitionArrow.nextTransitionValue
-      )
-        currentStatePtr = currentStates[i + 1];
-
-      i++;
+    if (
+      this.automataType === "DFA" &&
+      currentStatePtr.transitionArrow.presentTransitionValue ===
+        currentStatePtr.transitionArrow.nextTransitionValue &&
+      currentStatePtr.transitionArrow.nextTransitionValue ===
+        currentStatePtr.transitionArrow.previousTransitionValue
+    ) {
+      throw new Error("automata is not a DFA");
+    } else {
+      while (i < inputString.length) {
+        if (
+          currentStatePtr.transitionArrow.presentTransitionValue ===
+          inputString[i]
+        ) {
+          currentStatePtr = currentStatePtr.transitionArrow.presentState;
+        } else if (
+          currentStatePtr.transitionArrow.nextTransitionValue === inputString[i]
+        ) {
+          currentStatePtr = currentStatePtr.transitionArrow.nextState;
+        } else if (
+          currentStatePtr.transitionArrow.previousTransitionValue ===
+          inputString[i]
+        ) {
+          currentStatePtr = currentStatePtr.transitionArrow.previousState;
+        } else {
+        }
+        i++;
+      }
     }
+    // let currentStates = this.getAllStates();
+
+    // let i = 0;
+
+    // while (i < inputString.length) {
+    //   if (
+    //     inputString[i] === currentStates[i].transitionArrow.nextTransitionValue
+    //   )
+    //     currentStatePtr = currentStates[i + 1];
+
+    //   i++;
+    // }
 
     return this.isFinalState(currentStatePtr.name);
   }
