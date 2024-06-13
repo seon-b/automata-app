@@ -230,10 +230,7 @@ export default class FiniteAutomata {
     let i = 0;
     if (
       this.automataType === "DFA" &&
-      currentStatePtr.transitionArrow.presentTransitionValue ===
-        currentStatePtr.transitionArrow.nextTransitionValue &&
-      currentStatePtr.transitionArrow.nextTransitionValue ===
-        currentStatePtr.transitionArrow.previousTransitionValue
+      this.containsDuplicates(this.getAllTransitionValues(this.startState.name))
     ) {
       throw new Error("automata is not a DFA");
     } else {
@@ -257,18 +254,6 @@ export default class FiniteAutomata {
         i++;
       }
     }
-    // let currentStates = this.getAllStates();
-
-    // let i = 0;
-
-    // while (i < inputString.length) {
-    //   if (
-    //     inputString[i] === currentStates[i].transitionArrow.nextTransitionValue
-    //   )
-    //     currentStatePtr = currentStates[i + 1];
-
-    //   i++;
-    // }
 
     return this.isFinalState(currentStatePtr.name);
   }
