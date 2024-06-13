@@ -39,6 +39,17 @@ export default class FiniteAutomata {
     return this;
   }
 
+  containsDuplicates(transitionArrowValues) {
+    if (transitionArrowValues.length < 2) return false;
+    for (let i = 0; i < transitionArrowValues.length; i++) {
+      for (let j = i + 1; j < transitionArrowValues.length; j++) {
+        if (transitionArrowValues[i] === transitionArrowValues[j]) return true;
+      }
+    }
+
+    return false;
+  }
+
   findState(stateName) {
     if (!this.startState) return undefined;
 
@@ -74,18 +85,20 @@ export default class FiniteAutomata {
   getAllTransitionValues(index) {
     let currentState = this.getState(index);
     let listOfTransitionValues = [];
+    if (currentState.transitionArrow.nextTransitionValue !== undefined)
+      listOfTransitionValues.push(
+        currentState.transitionArrow.nextTransitionValue
+      );
 
-    listOfTransitionValues.push(
-      currentState.transitionArrow.nextTransitionValue
-    );
+    if (currentState.transitionArrow.presentTransitionValue !== undefined)
+      listOfTransitionValues.push(
+        currentState.transitionArrow.presentTransitionValue
+      );
 
-    listOfTransitionValues.push(
-      currentState.transitionArrow.presentTransitionValue
-    );
-
-    listOfTransitionValues.push(
-      currentState.transitionArrow.previousTransitionValue
-    );
+    if (currentState.transitionArrow.previousTransitionValue !== undefined)
+      listOfTransitionValues.push(
+        currentState.transitionArrow.previousTransitionValue
+      );
 
     return listOfTransitionValues;
   }
