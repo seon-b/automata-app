@@ -12,6 +12,8 @@ let appState = {
   stateType: "non-final",
   xCanvasCoordinate: canvasRect.x,
   yCanvasCoordinate: canvasRect.y,
+  nextXCanvasCoordinate: canvasRect.x,
+  nextYCanvasCoordinate: canvasRect.y,
 };
 
 let newAutomataGraphics = new AutomataGraphics();
@@ -29,12 +31,12 @@ const setAppState = (stateName, newStateValue) => {
 };
 
 const getCoordinates = (e) => {
-  setAppState("xCanvasCoordinate", e.clientX);
-  setAppState("yCanvasCoordinate", e.clientY);
+  setAppState("xCanvasCoordinate", e.clientX - canvasRect.x);
+  setAppState("yCanvasCoordinate", e.clientY - canvasRect.y);
 };
 
 const drawAutomata = (e) => {
-  if (appState.component === "state") {
+  if (appState.component === "state" && appState.drawingMode === "active") {
     getCoordinates(e);
     newAutomataGraphics.createState(
       appState.stateName,
@@ -42,6 +44,13 @@ const drawAutomata = (e) => {
       appState.xCanvasCoordinate,
       appState.yCanvasCoordinate
     );
+  } else if (
+    appState.component === "transition arrow" &&
+    appState.drawingMode === "active"
+  ) {
+    let currentXCoordinate = appState.xCanvasCoordinate;
+    let currentYCoordinate = appState.yCanvasCoordinate;
+    newAutomataGraphics.createNextTransition();
   }
 };
 
