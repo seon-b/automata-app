@@ -184,6 +184,8 @@ export default class FiniteAutomata {
   }
 
   setNextTransitionValue(value, stateName) {
+    if (this.lastState.name === stateName)
+      throw new Error("Cannot transition beyond the last state");
     let index = this.findState(stateName);
     let state = this.getState(index);
     state.transitionArrow.nextTransitionValue = value;
@@ -235,6 +237,11 @@ export default class FiniteAutomata {
       throw new Error("automata is not a DFA");
     } else {
       while (i < inputString.length) {
+        if (
+          currentStatePtr.transitionArrow.nextTransitionValue === undefined &&
+          this.lastState === currentStatePtr
+        )
+          return false;
         if (
           currentStatePtr.transitionArrow.presentTransitionValue ===
           inputString[i]
