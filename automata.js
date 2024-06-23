@@ -175,7 +175,7 @@ export default class FiniteAutomata {
     let currentStateIndex = this.findState(stateName);
     let currentState = this.getState(currentStateIndex);
     let nextStateIndex = this.findState(nextStateName);
-    let previousState = this.getState(nextStateIndex);
+    let nextState = this.getState(nextStateIndex);
 
     if (!(currentState && nextState))
       throw new Error("One or both states do not exist");
