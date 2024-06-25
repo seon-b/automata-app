@@ -77,11 +77,13 @@ const selectStateComponent = () => {
     setAppState("component", "state");
   }
 };
+
 const selectTransitionComponent = () => {
   if (appState.component === "state") {
     setAppState("component", "transition arrow");
   }
 };
+
 const changePlaceHolderText = (text) => {
   if (appState.component === "state") {
     automataData.getAttributeNode("placeholder").value = text;
@@ -95,7 +97,8 @@ const drawAutomata = (e) => {
       appState.stateName,
       appState.stateType,
       appState.xCanvasCoordinate,
-      appState.yCanvasCoordinate
+      appState.yCanvasCoordinate,
+      appState.stateRadius
     );
   } else if (
     appState.component === "transition arrow" &&
