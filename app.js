@@ -25,8 +25,9 @@ let appState = {
   stateName: "undefined",
   stateRadius: 40,
   stateType: "non-final",
-  nextXCanvasCoordinate: canvasRect.x,
-  nextYCanvasCoordinate: canvasRect.y,
+  selectedObject1: { xCoordinate: undefined, yCoordinate: undefined },
+  selectedObject2: { xCoordinate: undefined, yCoordinate: undefined },
+  selectedObjectCount: 0,
   xCanvasCoordinate: canvasRect.x,
   yCanvasCoordinate: canvasRect.y,
 };
@@ -50,10 +51,12 @@ const setAppState = (stateName, newStateValue) => {
     appState = { ...appState, stateRadius: newStateValue };
   } else if (stateName === "stateType") {
     appState = { ...appState, stateType: newStateValue };
-  } else if (stateName === "nextXCanvasCoordinate") {
-    appState = { ...appState, nextXCanvasCoordinate: newStateValue };
-  } else if (stateName === "nextYCanvasCoordinate") {
-    appState = { ...appState, nextYCanvasCoordinate: newStateValue };
+  } else if (stateName === "selectedObject1") {
+    appState = { ...appState, selectedObject1: newStateValue };
+  } else if (stateName === "selectedObject2") {
+    appState = { ...appState, selectedObject2: newStateValue };
+  } else if (stateName === "selectedObjectCount") {
+    appState = { ...appState, selectedObjectCount: newStateValue };
   } else if (stateName === "xCanvasCoordinate") {
     appState = { ...appState, xCanvasCoordinate: newStateValue };
   } else if (stateName === "yCanvasCoordinate") {
@@ -67,9 +70,28 @@ const getAutomataData = (e) => {
   if (appState.component === "state") changePlaceHolderText("Enter state name");
   setAppState("automataData", inputData);
 };
-const getCoordinates = (e) => {
-  setAppState("xCanvasCoordinate", e.clientX - canvasRect.x);
-  setAppState("yCanvasCoordinate", e.clientY - canvasRect.y);
+
+const getCoordinates = (coordinateType, e) => {
+  if (coordinateType === "canvas coordinates") {
+    setAppState("xCanvasCoordinate", e.clientX - canvasRect.x);
+    setAppState("yCanvasCoordinate", e.clientY - canvasRect.y);
+  } else if (coordinateType === "object coordinates") {
+    let currentObject = {
+      xCoordinate: e.clientX - canvasRect.x,
+      yCoordinate: e.clientY - canvasRect.y,
+    };
+    if (appState.selectedObjectCount === 0) {
+      setAppState("selectedObject1", currentObject);
+    } else if (appState.selectedObjectCount === 1) {
+      setAppState("selectedObject2", currentObject);
+    } else {
+      currentObject.xCoordinate = undefined;
+      currentObject.yCoordinate = undefined;
+      setAppState("selectedObject1", currentObject);
+      setAppState("selectedObject2", currentObject);
+    }
+  } else {
+  }
 };
 
 const selectStateComponent = () => {
@@ -92,7 +114,7 @@ const changePlaceHolderText = (text) => {
 
 const drawAutomata = (e) => {
   if (appState.component === "state" && appState.drawingMode === "active") {
-    getCoordinates(e);
+    getCoordinates("canvas coordinates", e);
     newAutomataGraphics.createState(
       appState.stateName,
       appState.stateType,
@@ -104,9 +126,25 @@ const drawAutomata = (e) => {
     appState.component === "transition arrow" &&
     appState.drawingMode === "active"
   ) {
-    let currentXCoordinate = appState.xCanvasCoordinate;
-    let currentYCoordinate = appState.yCanvasCoordinate;
-    newAutomataGraphics.createNextTransition();
+    getCoordinates("object coordinates", e);
+    modifySelectedObjectCount();
+    // newAutomataGraphics.createNextTransition();
+  }
+};
+
+const modifySelectedObjectCount = () => {
+  if (
+    appState.component === "transition arrow" &&
+    appState.drawingMode === "active"
+  ) {
+    if (appState.selectedObjectCount === 2) {
+      setAppState("selectedObjectCount", 0);
+    } else {
+      let currentCount = appState.selectedObjectCount;
+      currentCount++;
+      setAppState("selectedObjectCount", currentCount);
+    }
+  } else {
   }
 };
 
