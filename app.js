@@ -22,9 +22,11 @@ let appState = {
   stateButtonName: "Final State",
   drawingMode: "active",
   eraseMode: "inactive",
+  stateLocationCoordinates: [],
   stateName: "undefined",
   stateRadius: 40,
   stateType: "non-final",
+  stateLimit: 5,
   selectedObject1: { xCoordinate: undefined, yCoordinate: undefined },
   selectedObject2: { xCoordinate: undefined, yCoordinate: undefined },
   selectedObjectCount: 0,
@@ -85,14 +87,14 @@ const getCoordinates = (coordinateType, e) => {
     } else if (appState.selectedObjectCount === 1) {
       setAppState("selectedObject2", currentObject);
     } else {
-      currentObject.xCoordinate = undefined;
-      currentObject.yCoordinate = undefined;
-      setAppState("selectedObject1", currentObject);
-      setAppState("selectedObject2", currentObject);
     }
   } else {
   }
 };
+
+// const getObjectLocations = ()=>{
+
+// }
 
 const selectStateComponent = () => {
   if (appState.component === "transition arrow") {
@@ -113,8 +115,19 @@ const changePlaceHolderText = (text) => {
 };
 
 const drawAutomata = (e) => {
+  if (appState.stateLocationCoordinates.length === appState.stateLimit)
+    return alert(`Cannot create more than ${appState.stateLimit} states`);
   if (appState.component === "state" && appState.drawingMode === "active") {
     getCoordinates("canvas coordinates", e);
+    let newState = {
+      stateName: appState.stateName,
+      stateType: appState.stateType,
+      xCoordinate: appState.xCanvasCoordinate,
+      yCoordinate: appState.yCanvasCoordinate,
+      radius: appState.stateRadius,
+    };
+    appState.stateLocationCoordinates.push(newState);
+
     newAutomataGraphics.createState(
       appState.stateName,
       appState.stateType,
@@ -128,26 +141,40 @@ const drawAutomata = (e) => {
   ) {
     getCoordinates("object coordinates", e);
     modifySelectedObjectCount();
-    // newAutomataGraphics.createNextTransition();
+    newAutomataGraphics.createNextTransition(
+      "1",
+      appState.selectedObject1.xCoordinate,
+      appState.selectedObject1.yCoordinate,
+      appState.selectedObject2.xCoordinate,
+      appState.selectedObject2.yCoordinate
+    );
+    if (appState.selectedObjectCount === 1) appState.selectedObjectCount = 2;
+    if (appState.selectedObjectCount > 1) {
+      let currentObject = {
+        xCoordinate: undefined,
+        yCoordinate: undefined,
+      };
+
+      setAppState("selectedObject1", currentObject.xCoordinate);
+      setAppState("selectedObject1", currentObject.yCoordinate);
+      setAppState("selectedObject2", currentObject.xCoordinate);
+      setAppState("selectedObject2", currentObject.yCoordinate);
+    }
   }
 };
 
-const modifySelectedObjectCount = () => {
+const modifySelectedObjectCount = (currentCount) => {
   if (
     appState.component === "transition arrow" &&
     appState.drawingMode === "active"
   ) {
-    if (appState.selectedObjectCount === 2) {
-      setAppState("selectedObjectCount", 0);
-    } else {
-      let currentCount = appState.selectedObjectCount;
-      currentCount++;
-      setAppState("selectedObjectCount", currentCount);
-    }
-  } else {
+    if (currentCount === 0) return 0;
+
+    currentCount++;
+
+    return currentCount;
   }
 };
-
 const toggleDrawingMode = () => {
   if (appState.drawingMode === "active") {
     setAppState("drawingMode", "inactive");
