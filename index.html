@@ -9,11 +9,16 @@
   <body>
     <h1>Automata App</h1>
     <section class="toolbar">
-      <button type="button" id="drawButton">Draw</button>
-      <button type="button" id="eraseButton">Erase</button>
-      <button type="button" id="stateButton">State</button>
-      <button type="button" id="transitionButton">Transition Arrow</button>
-      <button type="button" id="changeStateButton">Change State</button>
+      <div class="toolbarFunctions">
+        <button type="button" id="drawButton">Draw</button>
+        <button type="button" id="eraseButton">Erase</button>
+        <button type="button" id="selectStateButton">Select State</button>
+        <button type="button" id="changeStateButton">Change State Type</button>
+      </div>
+      <div class="toolbarAutomataComponents">
+        <button type="button" id="stateButton">State</button>
+        <button type="button" id="transitionButton">Transition Arrow</button>
+      </div>
     </section>
     <section class="inputArea">
       <input type="text" id="automataData" placeholder="Enter state name" />
