@@ -11,25 +11,31 @@ let eraseButton = document.querySelector("#eraseButton");
 let parseButton = document.querySelector("#parse");
 let stateButton = document.querySelector("#stateButton");
 let submitButton = document.querySelector("#submit");
-let transitionButton = document.querySelector("#transitionButton");
+let transitionArrowButton = document.querySelector("#transitionArrowButton");
+
+let automataDataInput = document.querySelector("#automataData");
+let inputStringInput = document.querySelector("#inputString");
 
 let appState = {
   automataData: "",
   automataType: "",
+  changeStateTypeButton: "Change State Type",
   component: "state",
+  currentAutomataStates: [],
   drawButtonName: "Draw",
   eraseButtonName: "Erase",
-  stateButtonName: "Final State",
   drawingMode: "active",
   eraseMode: "inactive",
-  stateLocationCoordinates: [],
+  stateButtonName: "Final State",
+  transitionArrowButtonName: "Transition Arrow",
   stateName: "undefined",
   stateRadius: 40,
   stateType: "non-final",
   stateLimit: 5,
   selectedObject1: { xCoordinate: undefined, yCoordinate: undefined },
   selectedObject2: { xCoordinate: undefined, yCoordinate: undefined },
-  selectedObjectCount: 0,
+  selectStateButtonName: "Select State",
+  symbols: "",
   xCanvasCoordinate: canvasRect.x,
   yCanvasCoordinate: canvasRect.y,
 };
@@ -41,24 +47,40 @@ const setAppState = (stateName, newStateValue) => {
     appState = { ...appState, automataData: newStateValue };
   } else if (stateName === "automataType") {
     appState = { ...appState, automataType: newStateValue };
+  } else if (stateName === "changeStateTypeButton") {
+    appState = { ...appState, changeStateTypeButton: newStateValue };
   } else if (stateName === "component") {
     appState = { ...appState, component: newStateValue };
+  } else if (stateName === "currentAutomataStates") {
+    appState = { ...appState, currentAutomataStates: newStateValue };
+  } else if (stateName === "drawButtonName") {
+    appState = { ...appState, drawButtonName: newStateValue };
+  } else if (stateName === "eraseButtonName") {
+    appState = { ...appState, eraseButtonName: newStateValue };
   } else if (stateName === "drawingMode") {
     appState = { ...appState, drawingMode: newStateValue };
   } else if (stateName === "eraseMode") {
     appState = { ...appState, eraseMode: newStateValue };
+  } else if (stateName === "stateButtonName") {
+    appState = { ...appState, stateButtonName: newStateValue };
+  } else if (stateName === "transitionArrowButtonName") {
+    appState = { ...appState, transitionArrowButtonName: newStateValue };
   } else if (stateName === "stateName") {
     appState = { ...appState, stateName: newStateValue };
   } else if (stateName === "stateRadius") {
     appState = { ...appState, stateRadius: newStateValue };
   } else if (stateName === "stateType") {
     appState = { ...appState, stateType: newStateValue };
+  } else if (stateName === "stateLimit") {
+    appState = { ...appState, stateLimit: newStateValue };
   } else if (stateName === "selectedObject1") {
     appState = { ...appState, selectedObject1: newStateValue };
   } else if (stateName === "selectedObject2") {
     appState = { ...appState, selectedObject2: newStateValue };
-  } else if (stateName === "selectedObjectCount") {
-    appState = { ...appState, selectedObjectCount: newStateValue };
+  } else if (stateName === "selectStateButtonName") {
+    appState = { ...appState, selectStateButtonName: newStateValue };
+  } else if (stateName === "symbols") {
+    appState = { ...appState, symbols: newStateValue };
   } else if (stateName === "xCanvasCoordinate") {
     appState = { ...appState, xCanvasCoordinate: newStateValue };
   } else if (stateName === "yCanvasCoordinate") {
@@ -73,28 +95,10 @@ const getAutomataData = (e) => {
   setAppState("automataData", inputData);
 };
 
-const getCoordinates = (coordinateType, e) => {
-  if (coordinateType === "canvas coordinates") {
-    setAppState("xCanvasCoordinate", e.clientX - canvasRect.x);
-    setAppState("yCanvasCoordinate", e.clientY - canvasRect.y);
-  } else if (coordinateType === "object coordinates") {
-    let currentObject = {
-      xCoordinate: e.clientX - canvasRect.x,
-      yCoordinate: e.clientY - canvasRect.y,
-    };
-    if (appState.selectedObjectCount === 0) {
-      setAppState("selectedObject1", currentObject);
-    } else if (appState.selectedObjectCount === 1) {
-      setAppState("selectedObject2", currentObject);
-    } else {
-    }
-  } else {
-  }
+const getCoordinates = (e) => {
+  setAppState("xCanvasCoordinate", e.clientX - canvasRect.x);
+  setAppState("yCanvasCoordinate", e.clientY - canvasRect.y);
 };
-
-// const getObjectLocations = ()=>{
-
-// }
 
 const selectStateComponent = () => {
   if (appState.component === "transition arrow") {
@@ -115,18 +119,20 @@ const changePlaceHolderText = (text) => {
 };
 
 const drawAutomata = (e) => {
-  if (appState.stateLocationCoordinates.length === appState.stateLimit)
+  if (appState.currentAutomataStates.length === appState.stateLimit)
     return alert(`Cannot create more than ${appState.stateLimit} states`);
   if (appState.component === "state" && appState.drawingMode === "active") {
-    getCoordinates("canvas coordinates", e);
+    getCoordinates(e);
     let newState = {
       stateName: appState.stateName,
       stateType: appState.stateType,
       xCoordinate: appState.xCanvasCoordinate,
       yCoordinate: appState.yCanvasCoordinate,
       radius: appState.stateRadius,
+      isConnectedToNextState: false,
+      isConnectedToPreviousState: false,
     };
-    appState.stateLocationCoordinates.push(newState);
+    storeAutomataState(newState);
 
     newAutomataGraphics.createState(
       appState.stateName,
@@ -135,46 +141,77 @@ const drawAutomata = (e) => {
       appState.yCanvasCoordinate,
       appState.stateRadius
     );
+    connectStates(appState.currentAutomataStates);
   } else if (
     appState.component === "transition arrow" &&
     appState.drawingMode === "active"
   ) {
-    getCoordinates("object coordinates", e);
-    modifySelectedObjectCount();
+    getCoordinates(e);
+
     newAutomataGraphics.createNextTransition(
       "1",
       appState.selectedObject1.xCoordinate,
       appState.selectedObject1.yCoordinate,
       appState.selectedObject2.xCoordinate,
-      appState.selectedObject2.yCoordinate
+      appState.selectedObject2.yCoordinate,
+      appState.stateRadius
     );
-    if (appState.selectedObjectCount === 1) appState.selectedObjectCount = 2;
-    if (appState.selectedObjectCount > 1) {
-      let currentObject = {
-        xCoordinate: undefined,
-        yCoordinate: undefined,
-      };
-
-      setAppState("selectedObject1", currentObject.xCoordinate);
-      setAppState("selectedObject1", currentObject.yCoordinate);
-      setAppState("selectedObject2", currentObject.xCoordinate);
-      setAppState("selectedObject2", currentObject.yCoordinate);
-    }
   }
 };
 
-const modifySelectedObjectCount = (currentCount) => {
-  if (
-    appState.component === "transition arrow" &&
-    appState.drawingMode === "active"
-  ) {
-    if (currentCount === 0) return 0;
+const connectStates = () => {
+  if (appState.currentAutomataStates === 0) return alert("No states present");
 
-    currentCount++;
+  let currentObject = {
+    xCoordinate: "",
+    yCoordinate: "",
+  };
 
-    return currentCount;
+  let nextObject = {
+    xCoordinate: "",
+    yCoordinate: "",
+  };
+
+  for (let i = 0; i < appState.currentAutomataStates.length; i++) {
+    if (
+      appState.currentAutomataStates.length === 0 ||
+      appState.currentAutomataStates.length === 1
+    )
+      return;
+
+    currentObject.xCoordinate = appState.currentAutomataStates[i].xCoordinate;
+    currentObject.yCoordinate = appState.currentAutomataStates[i].yCoordinate;
+    nextObject.xCoordinate = appState.currentAutomataStates[i + 1].xCoordinate;
+    nextObject.yCoordinate = appState.currentAutomataStates[i + 1].yCoordinate;
+
+    setAppState("selectedObject1", currentObject);
+    setAppState("selectedObject2", nextObject);
+
+    newAutomataGraphics.createNextTransition(
+      "1",
+      appState.selectedObject1.xCoordinate,
+      appState.selectedObject1.yCoordinate,
+      appState.selectedObject2.xCoordinate,
+      appState.selectedObject2.yCoordinate,
+      appState.stateRadius
+    );
   }
 };
+
+const selectState = (e) => {
+  if (appState.currentAutomataStates === 0) return;
+  let xCoordinate = e.clientX - canvasRect.x;
+  let yCoordinate = e.clientY - canvasRect.y;
+  return (
+    xCoordinate < xCoordinate + appState.stateRadius &&
+    yCoordinate < yCoordinate + appState.stateRadius
+  );
+};
+
+const storeAutomataState = (state) => {
+  appState.currentAutomataStates.push(state);
+};
+
 const toggleDrawingMode = () => {
   if (appState.drawingMode === "active") {
     setAppState("drawingMode", "inactive");
@@ -208,5 +245,7 @@ canvas.addEventListener("click", drawAutomata);
 changeStateButton.addEventListener("click", toggleStateType);
 drawButton.addEventListener("click", toggleDrawingMode);
 eraseButton.addEventListener("click", toggleEraseMode);
+parseButton.addEventListener("click", parse);
 stateButton.addEventListener("click", selectStateComponent);
-transitionButton.addEventListener("click", selectTransitionComponent);
+submitButton.addEventListener("click", submit);
+transitionArrowButton.addEventListener("click", selectTransitionComponent);
