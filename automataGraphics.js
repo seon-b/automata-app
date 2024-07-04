@@ -7,6 +7,12 @@ export class AutomataGraphics {
     this.context = canvasContext;
   }
 
+  addText(text, xCoordinate, yCoordinate) {
+    this.context.font = "20px serif";
+    this.context.textAlign = "right-aligned";
+    this.context.fillText(text, xCoordinate, yCoordinate);
+  }
+
   createState(name, stateType, xCoordinate, yCoordinate, radius) {
     if (stateType === "final") this.context.lineWidth = 5;
     if (stateType === "non-final") this.context.lineWidth = 1;
@@ -26,13 +32,21 @@ export class AutomataGraphics {
     if (xCoordinate > xCoordinate2) {
       this.context.beginPath();
       this.context.moveTo(xCoordinate - radius, yCoordinate);
+      this.context.lineWidth = 1;
       this.context.lineTo(xCoordinate2 + radius, yCoordinate2);
       this.context.stroke();
     } else {
       this.context.beginPath();
       this.context.moveTo(xCoordinate + radius, yCoordinate);
+      this.context.lineWidth = 1;
       this.context.lineTo(xCoordinate2 - radius, yCoordinate2);
       this.context.stroke();
     }
+
+    this.addText(
+      transitionValue,
+      (xCoordinate + xCoordinate2) / 2,
+      (yCoordinate + yCoordinate2) / 2
+    );
   }
 }

@@ -14,10 +14,10 @@ let submitButton = document.querySelector("#submit");
 let transitionArrowButton = document.querySelector("#transitionArrowButton");
 
 let automataDataInput = document.querySelector("#automataData");
-let inputStringInput = document.querySelector("#inputString");
+let inputStringData = document.querySelector("#inputStringData");
 
 let appState = {
-  automataData: "",
+  automataData: [],
   automataType: "",
   changeStateTypeButton: "Change State Type",
   component: "state",
@@ -26,9 +26,10 @@ let appState = {
   eraseButtonName: "Erase",
   drawingMode: "active",
   eraseMode: "inactive",
+  inputStringData: [],
   stateButtonName: "Final State",
   transitionArrowButtonName: "Transition Arrow",
-  stateName: "undefined",
+  stateName: "",
   stateRadius: 40,
   stateType: "non-final",
   stateLimit: 5,
@@ -61,6 +62,8 @@ const setAppState = (stateName, newStateValue) => {
     appState = { ...appState, drawingMode: newStateValue };
   } else if (stateName === "eraseMode") {
     appState = { ...appState, eraseMode: newStateValue };
+  } else if (stateName === "inputStringData") {
+    appState = { ...appState, inputStringData: newStateValue };
   } else if (stateName === "stateButtonName") {
     appState = { ...appState, stateButtonName: newStateValue };
   } else if (stateName === "transitionArrowButtonName") {
@@ -89,10 +92,20 @@ const setAppState = (stateName, newStateValue) => {
   }
 };
 
-const getAutomataData = (e) => {
-  let inputData = e.target.value;
-  if (appState.component === "state") changePlaceHolderText("Enter state name");
-  setAppState("automataData", inputData);
+const getAutomataData = () => {
+  if (appState.component === "state") {
+    let inputData = automataDataInput.value.split(" ");
+    setAppState("automataData", inputData);
+  } else if (appState.component === "transition arrow") {
+    let inputData = automataDataInput.value.split("");
+    setAppState("automataData", inputData);
+  } else {
+  }
+};
+
+const getInputStringData = () => {
+  let inputData = inputStringData.value.split("");
+  setAppState("inputStringData", inputData);
 };
 
 const getCoordinates = (e) => {
@@ -103,18 +116,23 @@ const getCoordinates = (e) => {
 const selectStateComponent = () => {
   if (appState.component === "transition arrow") {
     setAppState("component", "state");
+    changePlaceHolderText("Enter state name");
   }
 };
 
 const selectTransitionComponent = () => {
   if (appState.component === "state") {
     setAppState("component", "transition arrow");
+    changePlaceHolderText("Enter Transition values");
   }
 };
 
 const changePlaceHolderText = (text) => {
   if (appState.component === "state") {
     automataData.getAttributeNode("placeholder").value = text;
+  } else if (appState.component === "transition arrow") {
+    automataData.getAttributeNode("placeholder").value = text;
+  } else {
   }
 };
 
@@ -148,14 +166,14 @@ const drawAutomata = (e) => {
   ) {
     getCoordinates(e);
 
-    newAutomataGraphics.createNextTransition(
-      "1",
-      appState.selectedObject1.xCoordinate,
-      appState.selectedObject1.yCoordinate,
-      appState.selectedObject2.xCoordinate,
-      appState.selectedObject2.yCoordinate,
-      appState.stateRadius
-    );
+    // newAutomataGraphics.createNextTransition(
+    //   "1",
+    //   appState.selectedObject1.xCoordinate,
+    //   appState.selectedObject1.yCoordinate,
+    //   appState.selectedObject2.xCoordinate,
+    //   appState.selectedObject2.yCoordinate,
+    //   appState.stateRadius
+    // );
   }
 };
 
@@ -172,6 +190,8 @@ const connectStates = () => {
     yCoordinate: "",
   };
 
+  let currentTransitionValue = "";
+
   for (let i = 0; i < appState.currentAutomataStates.length; i++) {
     if (
       appState.currentAutomataStates.length === 0 ||
@@ -187,8 +207,14 @@ const connectStates = () => {
     setAppState("selectedObject1", currentObject);
     setAppState("selectedObject2", nextObject);
 
+    if (appState.automataData.length === 0) {
+      currentTransitionValue = "";
+    } else {
+      currentTransitionValue = appState.automataData[i];
+    }
+
     newAutomataGraphics.createNextTransition(
-      "1",
+      currentTransitionValue,
       appState.selectedObject1.xCoordinate,
       appState.selectedObject1.yCoordinate,
       appState.selectedObject2.xCoordinate,
@@ -206,6 +232,14 @@ const selectState = (e) => {
     xCoordinate < xCoordinate + appState.stateRadius &&
     yCoordinate < yCoordinate + appState.stateRadius
   );
+};
+
+const parse = () => {
+  getInputStringData();
+};
+
+const submit = () => {
+  getAutomataData();
 };
 
 const storeAutomataState = (state) => {
