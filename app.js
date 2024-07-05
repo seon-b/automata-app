@@ -8,6 +8,7 @@ let automataData = document.querySelector("#automataData");
 let changeStateButton = document.querySelector("#changeStateButton");
 let drawButton = document.querySelector("#drawButton");
 let eraseButton = document.querySelector("#eraseButton");
+let ErrorDisplayArea = document.querySelector("#errorDisplay");
 let parseButton = document.querySelector("#parse");
 let stateButton = document.querySelector("#stateButton");
 let submitButton = document.querySelector("#submit");
@@ -26,6 +27,7 @@ let appState = {
   eraseButtonName: "Erase",
   drawingMode: "active",
   eraseMode: "inactive",
+  error: { isErrorPresent: false, message: "" },
   inputStringData: [],
   stateButtonName: "Final State",
   transitionArrowButtonName: "Transition Arrow",
@@ -62,6 +64,10 @@ const setAppState = (stateName, newStateValue) => {
     appState = { ...appState, drawingMode: newStateValue };
   } else if (stateName === "eraseMode") {
     appState = { ...appState, eraseMode: newStateValue };
+  } else if (stateName === "error") {
+    appState = { ...appState, error: { isErrorPresent: newStateValue } };
+  } else if (stateName === "errorMessage") {
+    appState = { ...appState, error: { message: newStateValue } };
   } else if (stateName === "inputStringData") {
     appState = { ...appState, inputStringData: newStateValue };
   } else if (stateName === "stateButtonName") {
@@ -98,7 +104,13 @@ const getAutomataData = () => {
     setAppState("automataData", inputData);
   } else if (appState.component === "transition arrow") {
     let inputData = automataDataInput.value.split("");
-    setAppState("automataData", inputData);
+    validateInput("transition values", inputData);
+    if (appState.error.isErrorPresent === true) {
+      displayError();
+      return;
+    } else {
+      setAppState("automataData", inputData);
+    }
   } else {
   }
 };
@@ -174,6 +186,12 @@ const drawAutomata = (e) => {
     //   appState.selectedObject2.yCoordinate,
     //   appState.stateRadius
     // );
+  }
+};
+
+const displayError = () => {
+  if (appState.error.isErrorPresent === true) {
+    ErrorDisplayArea.firstElementChild.innerHTML = appState.error.message;
   }
 };
 
@@ -271,6 +289,24 @@ const toggleStateType = () => {
     setAppState("stateType", "non-final");
   } else {
     setAppState("stateType", "final");
+  }
+};
+
+const validateInput = (inputType, input) => {
+  if (inputType === "transition values") {
+    if (input.length < appState.stateLimit) {
+      setAppState("error", false);
+      setAppState("errorMessage", "");
+    } else {
+      setAppState("error", true);
+      setAppState(
+        "errorMessage",
+        `Error cannot have more than ${
+          appState.stateLimit - 1
+        } transition values`
+      );
+      displayError();
+    }
   }
 };
 
