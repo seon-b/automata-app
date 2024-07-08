@@ -8,6 +8,9 @@
   </head>
   <body>
     <h1>Automata App</h1>
+    <section class="errorArea">
+      <div class="errorDisplay"><h3 id="errorMessage"></h3></div>
+    </section>
     <section class="toolbar">
       <div class="toolbarFunctions">
         <button type="button" id="drawButton">Draw</button>
@@ -28,11 +31,10 @@
       <input type="text" id="inputStringData" placeholder="Enter symbols..." />
       <button type="button" id="parse">Parse</button>
     </section>
-    <section class="errorArea">
-      <div class="errorDisplay"><h6 class="errorMessage"></h6></div>
-    </section>
+
     <canvas id="canvas" width="600" height="500"></canvas>
     <script type="module" src="app.js"></script>
     <script type="module" src="automataGraphics.js"></script>
+    <script type="module" src="error.js"></script>
   </body>
 </html>
