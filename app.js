@@ -1,5 +1,6 @@
 import FiniteAutomata from "./automata.js";
 import { AutomataGraphics } from "./automataGraphics.js";
+import { validateInput } from "./error.js";
 
 const canvas = document.querySelector("#canvas");
 let canvasRect = canvas.getBoundingClientRect();
@@ -8,7 +9,7 @@ let automataData = document.querySelector("#automataData");
 let changeStateButton = document.querySelector("#changeStateButton");
 let drawButton = document.querySelector("#drawButton");
 let eraseButton = document.querySelector("#eraseButton");
-let ErrorDisplayArea = document.querySelector("#errorDisplay");
+let errorDisplay = document.querySelector("#errorDisplay");
 let parseButton = document.querySelector("#parse");
 let stateButton = document.querySelector("#stateButton");
 let submitButton = document.querySelector("#submit");
@@ -27,7 +28,6 @@ let appState = {
   eraseButtonName: "Erase",
   drawingMode: "active",
   eraseMode: "inactive",
-  error: { isErrorPresent: false, message: "" },
   inputStringData: [],
   stateButtonName: "Final State",
   transitionArrowButtonName: "Transition Arrow",
@@ -64,10 +64,6 @@ const setAppState = (stateName, newStateValue) => {
     appState = { ...appState, drawingMode: newStateValue };
   } else if (stateName === "eraseMode") {
     appState = { ...appState, eraseMode: newStateValue };
-  } else if (stateName === "error") {
-    appState = { ...appState, error: { isErrorPresent: newStateValue } };
-  } else if (stateName === "errorMessage") {
-    appState = { ...appState, error: { message: newStateValue } };
   } else if (stateName === "inputStringData") {
     appState = { ...appState, inputStringData: newStateValue };
   } else if (stateName === "stateButtonName") {
@@ -101,10 +97,11 @@ const setAppState = (stateName, newStateValue) => {
 const getAutomataData = () => {
   if (appState.component === "state") {
     let inputData = automataDataInput.value.split(" ");
+
     setAppState("automataData", inputData);
   } else if (appState.component === "transition arrow") {
     let inputData = automataDataInput.value.split("");
-    validateInput("transition values", inputData);
+
     if (appState.error.isErrorPresent === true) {
       displayError();
       return;
@@ -116,8 +113,12 @@ const getAutomataData = () => {
 };
 
 const getInputStringData = () => {
-  let inputData = inputStringData.value.split("");
-  setAppState("inputStringData", inputData);
+  let inputData = inputStringData.value;
+
+  if (validateInput("input", inputData) === true) {
+  } else {
+    setAppState("inputStringData", inputData.split(""));
+  }
 };
 
 const getCoordinates = (e) => {
@@ -149,8 +150,8 @@ const changePlaceHolderText = (text) => {
 };
 
 const drawAutomata = (e) => {
-  if (appState.currentAutomataStates.length === appState.stateLimit)
-    return alert(`Cannot create more than ${appState.stateLimit} states`);
+  // if (appState.currentAutomataStates.length === appState.stateLimit)
+  //   return alert(`Cannot create more than ${appState.stateLimit} states`);
   if (appState.component === "state" && appState.drawingMode === "active") {
     getCoordinates(e);
     let newState = {
@@ -190,8 +191,8 @@ const drawAutomata = (e) => {
 };
 
 const displayError = () => {
-  if (appState.error.isErrorPresent === true) {
-    ErrorDisplayArea.firstElementChild.innerHTML = appState.error.message;
+  if (appState.isErrorPresent === true) {
+    errorDisplay.innerHTML = appState.errorMessage;
   }
 };
 
@@ -256,12 +257,12 @@ const parse = () => {
   getInputStringData();
 };
 
-const submit = () => {
-  getAutomataData();
-};
-
 const storeAutomataState = (state) => {
   appState.currentAutomataStates.push(state);
+};
+
+const submit = () => {
+  getAutomataData();
 };
 
 const toggleDrawingMode = () => {
@@ -292,25 +293,6 @@ const toggleStateType = () => {
   }
 };
 
-const validateInput = (inputType, input) => {
-  if (inputType === "transition values") {
-    if (input.length < appState.stateLimit) {
-      setAppState("error", false);
-      setAppState("errorMessage", "");
-    } else {
-      setAppState("error", true);
-      setAppState(
-        "errorMessage",
-        `Error cannot have more than ${
-          appState.stateLimit - 1
-        } transition values`
-      );
-      displayError();
-    }
-  }
-};
-
-automataData.addEventListener("input", getAutomataData);
 canvas.addEventListener("click", drawAutomata);
 changeStateButton.addEventListener("click", toggleStateType);
 drawButton.addEventListener("click", toggleDrawingMode);
