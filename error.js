@@ -1,7 +1,14 @@
+export let errorObject = {
+  errorMessage: "",
+};
+
+export const setErrorObject = (message) => {
+  errorObject = { ...errorObject, errorMessage: message };
+};
+
 export const isInputEmpty = (input) => {
   let regExPattern = /^\s*$/;
-
-  return regExPattern.test(input);
+  if (regExPattern.test(input) === true) return regExPattern.test(input);
 };
 
 export const isValidNumberOfStates = (numberOfStates, stateLimit) => {
