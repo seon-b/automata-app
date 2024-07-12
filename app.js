@@ -1,14 +1,15 @@
 import FiniteAutomata from "./automata.js";
 import { AutomataGraphics } from "./automataGraphics.js";
 import {
-  validateInput,
+  errorObject,
   isInputEmpty,
   isValidNumberOfStates,
   isValidNumberOfTransitions,
+  setErrorObject,
+  validateInput,
 } from "./error.js";
 
 const canvas = document.querySelector("#canvas");
-let canvasRect = canvas.getBoundingClientRect();
 
 let automataData = document.querySelector("#automataData");
 let changeStateButton = document.querySelector("#changeStateButton");
@@ -22,6 +23,13 @@ let transitionArrowButton = document.querySelector("#transitionArrowButton");
 
 let automataDataInput = document.querySelector("#automataData");
 let inputStringData = document.querySelector("#inputStringData");
+
+errorDisplay.style.height = "20px";
+errorDisplay.style.width = "300px";
+errorDisplay.style.padding = "10px";
+errorDisplay.style.border = "2px";
+
+let canvasRect = canvas.getBoundingClientRect();
 
 let appState = {
   automataData: [],
@@ -100,8 +108,10 @@ const setAppState = (stateName, newStateValue) => {
 };
 
 const getAutomataData = () => {
-  if (isInputEmpty(automataDataInput.value) === true) {
-    return alert("Cannot have empty input");
+  if (isInputEmpty(inputStringData.value) === true) {
+    setErrorObject("cannot have empty input");
+    displayError();
+    return;
   }
 
   if (appState.component === "state") {
@@ -127,7 +137,8 @@ const getAutomataData = () => {
 
 const getInputStringData = () => {
   if (isInputEmpty(inputStringData.value) === true) {
-    return alert("Cannot have empty input");
+    setErrorObject("cannot have empty input");
+    return;
   }
 
   let inputData = inputStringData.value;
@@ -172,8 +183,11 @@ const drawAutomata = (e) => {
       appState.currentAutomataStates.length,
       appState.stateLimit
     ) === false
-  )
-    return alert(`Cannot create more than ${appState.stateLimit} states`);
+  ) {
+    setErrorObject(`Cannot create more than ${appState.stateLimit} states`);
+    displayError();
+    return;
+  }
   if (appState.component === "state" && appState.drawingMode === "active") {
     getCoordinates(e);
     let newState = {
@@ -213,8 +227,16 @@ const drawAutomata = (e) => {
 };
 
 const displayError = () => {
-  if (appState.isErrorPresent === true) {
-    errorDisplay.innerHTML = appState.errorMessage;
+  if (errorObject.errorMessage !== "") {
+    errorDisplay.innerHTML = errorObject.errorMessage;
+    errorDisplay.classList.add("errorStyle");
+    updateCanvasRect();
+    setTimeout(() => {
+      setErrorObject("");
+      updateCanvasRect();
+      errorDisplay.innerHTML = errorObject.errorMessage;
+      errorDisplay.classList.remove("errorStyle");
+    }, 1000);
   }
 };
 
@@ -313,6 +335,10 @@ const toggleStateType = () => {
   } else {
     setAppState("stateType", "final");
   }
+};
+
+const updateCanvasRect = () => {
+  canvasRect = canvas.getBoundingClientRect();
 };
 
 canvas.addEventListener("click", drawAutomata);
