@@ -1,6 +1,11 @@
 import FiniteAutomata from "./automata.js";
 import { AutomataGraphics } from "./automataGraphics.js";
-import { validateInput } from "./error.js";
+import {
+  validateInput,
+  isInputEmpty,
+  isValidNumberOfStates,
+  isValidNumberOfTransitions,
+} from "./error.js";
 
 const canvas = document.querySelector("#canvas");
 let canvasRect = canvas.getBoundingClientRect();
@@ -95,24 +100,36 @@ const setAppState = (stateName, newStateValue) => {
 };
 
 const getAutomataData = () => {
+  if (isInputEmpty(automataDataInput.value) === true) {
+    return alert("Cannot have empty input");
+  }
+
   if (appState.component === "state") {
     let inputData = automataDataInput.value.split(" ");
 
     setAppState("automataData", inputData);
   } else if (appState.component === "transition arrow") {
     let inputData = automataDataInput.value.split("");
-
-    if (appState.error.isErrorPresent === true) {
-      displayError();
-      return;
-    } else {
-      setAppState("automataData", inputData);
-    }
+    if (
+      isValidNumberOfTransitions(inputData.length, appState.stateLimit) ===
+      false
+    )
+      return alert(
+        `Cannot create more than ${appState.stateLimit - 1} transitions`
+      );
+    setAppState(
+      "automataData",
+      inputData.filter((e) => e !== " ")
+    );
   } else {
   }
 };
 
 const getInputStringData = () => {
+  if (isInputEmpty(inputStringData.value) === true) {
+    return alert("Cannot have empty input");
+  }
+
   let inputData = inputStringData.value;
 
   if (validateInput("input", inputData) === true) {
@@ -136,7 +153,7 @@ const selectStateComponent = () => {
 const selectTransitionComponent = () => {
   if (appState.component === "state") {
     setAppState("component", "transition arrow");
-    changePlaceHolderText("Enter Transition values");
+    changePlaceHolderText("Enter transition values");
   }
 };
 
@@ -150,8 +167,13 @@ const changePlaceHolderText = (text) => {
 };
 
 const drawAutomata = (e) => {
-  // if (appState.currentAutomataStates.length === appState.stateLimit)
-  //   return alert(`Cannot create more than ${appState.stateLimit} states`);
+  if (
+    isValidNumberOfStates(
+      appState.currentAutomataStates.length,
+      appState.stateLimit
+    ) === false
+  )
+    return alert(`Cannot create more than ${appState.stateLimit} states`);
   if (appState.component === "state" && appState.drawingMode === "active") {
     getCoordinates(e);
     let newState = {

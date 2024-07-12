@@ -1,27 +1,22 @@
-const isInputEmpty = (input) => {
-  let isAllEmptyString = false;
+export const isInputEmpty = (input) => {
+  let regExPattern = /^\s*$/;
 
-  for (let i = 0; i < input.length; i++) {
-    if (input[i] !== "") {
-      return false;
-    } else {
-      isAllEmptyString = true;
-    }
-  }
-
-  return isAllEmptyString;
+  return regExPattern.test(input);
 };
 
-const isValidNumberOfStates = (numberOfStates, stateLimit) => {
-  if (numberOfStates > stateLimit) {
-    return false;
-  } else {
+export const isValidNumberOfStates = (numberOfStates, stateLimit) => {
+  if (numberOfStates < stateLimit) {
     return true;
+  } else {
+    return false;
   }
 };
 
-const isValidNumberOfTransitions = (numberOfTransitionValues, stateLimit) => {
-  if (numberOfTransitionValues >= stateLimit) {
+export const isValidNumberOfTransitions = (
+  numberOfTransitionValues,
+  stateLimit
+) => {
+  if (numberOfTransitionValues > stateLimit - 1) {
     return false;
   } else {
     return true;
@@ -29,11 +24,8 @@ const isValidNumberOfTransitions = (numberOfTransitionValues, stateLimit) => {
 };
 
 export function validateInput(validationType, input) {
-  if (validationType === "empty lnput") {
+  if (validationType === "input") {
     return isInputEmpty(input);
-  } else if (validationType === "state limit") {
-    return isValidNumberOfStates(input.numberOfStates, input.stateLimit);
-  } else if (validationType === "transition limit") {
-    return isValidNumberOfTransitions(input.transitionValues, input.stateLimit);
+  } else {
   }
 }
