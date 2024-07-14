@@ -108,7 +108,7 @@ const setAppState = (stateName, newStateValue) => {
 };
 
 const getAutomataData = () => {
-  if (isInputEmpty(inputStringData.value) === true) {
+  if (isInputEmpty(automataDataInput.value) === true) {
     setErrorObject("cannot have empty input");
     displayError();
     return;
@@ -119,18 +119,19 @@ const getAutomataData = () => {
 
     setAppState("automataData", inputData);
   } else if (appState.component === "transition arrow") {
-    let inputData = automataDataInput.value.split("");
+    let inputData = automataDataInput.value.split("").filter((e) => e !== " ");
     if (
-      isValidNumberOfTransitions(inputData.length, appState.stateLimit) ===
-      false
-    )
-      return alert(
-        `Cannot create more than ${appState.stateLimit - 1} transitions`
+      isValidNumberOfTransitions(inputData.length, appState.stateLimit) === true
+    ) {
+      setAppState("automataData", inputData);
+    } else {
+      setAppState("automataData", []);
+      setErrorObject(
+        `cannot have more than ${appState.stateLimit - 1} transitions`
       );
-    setAppState(
-      "automataData",
-      inputData.filter((e) => e !== " ")
-    );
+
+      displayError();
+    }
   } else {
   }
 };
