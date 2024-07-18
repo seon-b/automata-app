@@ -37,6 +37,7 @@ let appState = {
   changeStateTypeButton: "Change State Type",
   component: "state",
   currentAutomataStates: [],
+  currentTransitionValues: [],
   drawButtonName: "Draw",
   eraseButtonName: "Erase",
   drawingMode: "active",
@@ -58,7 +59,7 @@ let appState = {
 
 let newAutomataGraphics = new AutomataGraphics();
 
-const setAppState = (stateName, newStateValue) => {
+function setAppState(stateName, newStateValue) {
   if (stateName === "automataData") {
     appState = { ...appState, automataData: newStateValue };
   } else if (stateName === "automataType") {
@@ -69,6 +70,8 @@ const setAppState = (stateName, newStateValue) => {
     appState = { ...appState, component: newStateValue };
   } else if (stateName === "currentAutomataStates") {
     appState = { ...appState, currentAutomataStates: newStateValue };
+  } else if (stateName === "currentTransitionValues") {
+    appState = { ...appState, currentTransitionValues: newStateValue };
   } else if (stateName === "drawButtonName") {
     appState = { ...appState, drawButtonName: newStateValue };
   } else if (stateName === "eraseButtonName") {
@@ -105,9 +108,13 @@ const setAppState = (stateName, newStateValue) => {
     appState = { ...appState, yCanvasCoordinate: newStateValue };
   } else {
   }
-};
+}
 
-const getAutomataData = () => {
+function clearCanvas() {
+  newAutomataGraphics.clearAll();
+}
+
+function getAutomataData() {
   if (isInputEmpty(automataDataInput.value) === true) {
     setErrorObject("cannot have empty input");
     displayError();
@@ -120,12 +127,16 @@ const getAutomataData = () => {
     setAppState("automataData", inputData);
   } else if (appState.component === "transition arrow") {
     let inputData = automataDataInput.value.split("").filter((e) => e !== " ");
+    setAppState("stateLimit", inputData.length + 1);
+
     if (
       isValidNumberOfTransitions(inputData.length, appState.stateLimit) === true
     ) {
       setAppState("automataData", inputData);
+      setAppState("currentTransitionValues", inputData);
     } else {
       setAppState("automataData", []);
+      setAppState("currentTransitionValues", []);
       setErrorObject(
         `cannot have more than ${appState.stateLimit - 1} transitions`
       );
@@ -134,9 +145,9 @@ const getAutomataData = () => {
     }
   } else {
   }
-};
+}
 
-const getInputStringData = () => {
+function getInputStringData() {
   if (isInputEmpty(inputStringData.value) === true) {
     setErrorObject("cannot have empty input");
     return;
@@ -148,37 +159,37 @@ const getInputStringData = () => {
   } else {
     setAppState("inputStringData", inputData.split(""));
   }
-};
+}
 
-const getCoordinates = (e) => {
+function getCoordinates(e) {
   setAppState("xCanvasCoordinate", e.clientX - canvasRect.x);
   setAppState("yCanvasCoordinate", e.clientY - canvasRect.y);
-};
+}
 
-const selectStateComponent = () => {
+function selectStateComponent() {
   if (appState.component === "transition arrow") {
     setAppState("component", "state");
     changePlaceHolderText("Enter state name");
   }
-};
+}
 
-const selectTransitionComponent = () => {
+function selectTransitionComponent() {
   if (appState.component === "state") {
     setAppState("component", "transition arrow");
     changePlaceHolderText("Enter transition values");
   }
-};
+}
 
-const changePlaceHolderText = (text) => {
+function changePlaceHolderText(text) {
   if (appState.component === "state") {
     automataData.getAttributeNode("placeholder").value = text;
   } else if (appState.component === "transition arrow") {
     automataData.getAttributeNode("placeholder").value = text;
   } else {
   }
-};
+}
 
-const drawAutomata = (e) => {
+function drawAutomata(e) {
   if (
     isValidNumberOfStates(
       appState.currentAutomataStates.length,
@@ -190,6 +201,11 @@ const drawAutomata = (e) => {
     return;
   }
   if (appState.component === "state" && appState.drawingMode === "active") {
+    if (appState.currentTransitionValues.length === 0) {
+      setErrorObject("cannot create state without transition values");
+      displayError();
+      return;
+    }
     getCoordinates(e);
     let newState = {
       stateName: appState.stateName,
@@ -225,9 +241,9 @@ const drawAutomata = (e) => {
     //   appState.stateRadius
     // );
   }
-};
+}
 
-const displayError = () => {
+function displayError() {
   if (errorObject.errorMessage !== "") {
     errorDisplay.innerHTML = errorObject.errorMessage;
     errorDisplay.classList.add("errorStyle");
@@ -239,10 +255,15 @@ const displayError = () => {
       errorDisplay.classList.remove("errorStyle");
     }, 1000);
   }
-};
+}
 
-const connectStates = () => {
-  if (appState.currentAutomataStates === 0) return alert("No states present");
+function connectStates() {
+  // if (appState.currentAutomataStates === 0) return alert("No states present");
+  if (appState.currentAutomataStates === 0) {
+    setErrorObject("no states present");
+    displayError();
+    return;
+  }
 
   let currentObject = {
     xCoordinate: "",
@@ -286,9 +307,9 @@ const connectStates = () => {
       appState.stateRadius
     );
   }
-};
+}
 
-const selectState = (e) => {
+function selectState(e) {
   if (appState.currentAutomataStates === 0) return;
   let xCoordinate = e.clientX - canvasRect.x;
   let yCoordinate = e.clientY - canvasRect.y;
@@ -296,21 +317,23 @@ const selectState = (e) => {
     xCoordinate < xCoordinate + appState.stateRadius &&
     yCoordinate < yCoordinate + appState.stateRadius
   );
-};
+}
 
-const parse = () => {
+function parse() {
   getInputStringData();
-};
+}
 
-const storeAutomataState = (state) => {
+function storeAutomataState(state) {
   appState.currentAutomataStates.push(state);
-};
+}
 
-const submit = () => {
+function submit() {
+  clearCanvas();
+  setAppState("automataData", []);
   getAutomataData();
-};
+}
 
-const toggleDrawingMode = () => {
+function toggleDrawingMode() {
   if (appState.drawingMode === "active") {
     setAppState("drawingMode", "inactive");
     setAppState("eraseMode", "active");
@@ -318,9 +341,9 @@ const toggleDrawingMode = () => {
     setAppState("drawingMode", "active");
     setAppState("eraseMode", "inactive");
   }
-};
+}
 
-const toggleEraseMode = () => {
+function toggleEraseMode() {
   if (appState.eraseMode === "active") {
     setAppState("eraseMode", "inactive");
     setAppState("drawingMode", "active");
@@ -328,19 +351,19 @@ const toggleEraseMode = () => {
     setAppState("eraseMode", "active");
     setAppState("drawingMode", "inactive");
   }
-};
+}
 
-const toggleStateType = () => {
+function toggleStateType() {
   if (appState.stateType === "final") {
     setAppState("stateType", "non-final");
   } else {
     setAppState("stateType", "final");
   }
-};
+}
 
-const updateCanvasRect = () => {
+function updateCanvasRect() {
   canvasRect = canvas.getBoundingClientRect();
-};
+}
 
 canvas.addEventListener("click", drawAutomata);
 changeStateButton.addEventListener("click", toggleStateType);
