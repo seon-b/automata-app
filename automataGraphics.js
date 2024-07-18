@@ -13,6 +13,10 @@ export class AutomataGraphics {
     this.context.fillText(text, xCoordinate, yCoordinate);
   }
 
+  clearAll() {
+    this.context.clearRect(0, 0, canvas.width, canvas.height);
+  }
+
   createState(name, stateType, xCoordinate, yCoordinate, radius) {
     if (stateType === "final") this.context.lineWidth = 5;
     if (stateType === "non-final") this.context.lineWidth = 1;

@@ -110,82 +110,68 @@ function setAppState(stateName, newStateValue) {
   }
 }
 
-function clearCanvas() {
-  newAutomataGraphics.clearAll();
-}
-
-function getAutomataData() {
-  if (isInputEmpty(automataDataInput.value) === true) {
-    setErrorObject("cannot have empty input");
-    displayError();
-    return;
-  }
-
-  if (appState.component === "state") {
-    let inputData = automataDataInput.value.split(" ");
-
-    setAppState("automataData", inputData);
-  } else if (appState.component === "transition arrow") {
-    let inputData = automataDataInput.value.split("").filter((e) => e !== " ");
-    setAppState("stateLimit", inputData.length + 1);
-
-    if (
-      isValidNumberOfTransitions(inputData.length, appState.stateLimit) === true
-    ) {
-      setAppState("automataData", inputData);
-      setAppState("currentTransitionValues", inputData);
-    } else {
-      setAppState("automataData", []);
-      setAppState("currentTransitionValues", []);
-      setErrorObject(
-        `cannot have more than ${appState.stateLimit - 1} transitions`
-      );
-
-      displayError();
-    }
-  } else {
-  }
-}
-
-function getInputStringData() {
-  if (isInputEmpty(inputStringData.value) === true) {
-    setErrorObject("cannot have empty input");
-    return;
-  }
-
-  let inputData = inputStringData.value;
-
-  if (validateInput("input", inputData) === true) {
-  } else {
-    setAppState("inputStringData", inputData.split(""));
-  }
-}
-
-function getCoordinates(e) {
-  setAppState("xCanvasCoordinate", e.clientX - canvasRect.x);
-  setAppState("yCanvasCoordinate", e.clientY - canvasRect.y);
-}
-
-function selectStateComponent() {
-  if (appState.component === "transition arrow") {
-    setAppState("component", "state");
-    changePlaceHolderText("Enter state name");
-  }
-}
-
-function selectTransitionComponent() {
-  if (appState.component === "state") {
-    setAppState("component", "transition arrow");
-    changePlaceHolderText("Enter transition values");
-  }
-}
-
 function changePlaceHolderText(text) {
   if (appState.component === "state") {
     automataData.getAttributeNode("placeholder").value = text;
   } else if (appState.component === "transition arrow") {
     automataData.getAttributeNode("placeholder").value = text;
   } else {
+  }
+}
+
+function clearCanvas() {
+  newAutomataGraphics.clearAll();
+}
+
+function connectStates() {
+  // if (appState.currentAutomataStates === 0) return alert("No states present");
+  if (appState.currentAutomataStates === 0) {
+    setErrorObject("no states present");
+    displayError();
+    return;
+  }
+
+  let currentObject = {
+    xCoordinate: "",
+    yCoordinate: "",
+  };
+
+  let nextObject = {
+    xCoordinate: "",
+    yCoordinate: "",
+  };
+
+  let currentTransitionValue = "";
+
+  for (let i = 0; i < appState.currentAutomataStates.length; i++) {
+    if (
+      appState.currentAutomataStates.length === 0 ||
+      appState.currentAutomataStates.length === 1
+    )
+      return;
+
+    currentObject.xCoordinate = appState.currentAutomataStates[i].xCoordinate;
+    currentObject.yCoordinate = appState.currentAutomataStates[i].yCoordinate;
+    nextObject.xCoordinate = appState.currentAutomataStates[i + 1].xCoordinate;
+    nextObject.yCoordinate = appState.currentAutomataStates[i + 1].yCoordinate;
+
+    setAppState("selectedObject1", currentObject);
+    setAppState("selectedObject2", nextObject);
+
+    if (appState.automataData.length === 0) {
+      currentTransitionValue = "";
+    } else {
+      currentTransitionValue = appState.automataData[i];
+    }
+
+    newAutomataGraphics.createNextTransition(
+      currentTransitionValue,
+      appState.selectedObject1.xCoordinate,
+      appState.selectedObject1.yCoordinate,
+      appState.selectedObject2.xCoordinate,
+      appState.selectedObject2.yCoordinate,
+      appState.stateRadius
+    );
   }
 }
 
@@ -257,55 +243,62 @@ function displayError() {
   }
 }
 
-function connectStates() {
-  // if (appState.currentAutomataStates === 0) return alert("No states present");
-  if (appState.currentAutomataStates === 0) {
-    setErrorObject("no states present");
+function getAutomataData() {
+  if (isInputEmpty(automataDataInput.value) === true) {
+    setErrorObject("cannot have empty input");
     displayError();
     return;
   }
 
-  let currentObject = {
-    xCoordinate: "",
-    yCoordinate: "",
-  };
+  if (appState.component === "state") {
+    let inputData = automataDataInput.value.split(" ");
 
-  let nextObject = {
-    xCoordinate: "",
-    yCoordinate: "",
-  };
+    setAppState("automataData", inputData);
+  } else if (appState.component === "transition arrow") {
+    let inputData = automataDataInput.value.split("").filter((e) => e !== " ");
+    setAppState("stateLimit", inputData.length + 1);
 
-  let currentTransitionValue = "";
-
-  for (let i = 0; i < appState.currentAutomataStates.length; i++) {
     if (
-      appState.currentAutomataStates.length === 0 ||
-      appState.currentAutomataStates.length === 1
-    )
-      return;
-
-    currentObject.xCoordinate = appState.currentAutomataStates[i].xCoordinate;
-    currentObject.yCoordinate = appState.currentAutomataStates[i].yCoordinate;
-    nextObject.xCoordinate = appState.currentAutomataStates[i + 1].xCoordinate;
-    nextObject.yCoordinate = appState.currentAutomataStates[i + 1].yCoordinate;
-
-    setAppState("selectedObject1", currentObject);
-    setAppState("selectedObject2", nextObject);
-
-    if (appState.automataData.length === 0) {
-      currentTransitionValue = "";
+      isValidNumberOfTransitions(inputData.length, appState.stateLimit) === true
+    ) {
+      setAppState("automataData", inputData);
+      setAppState("currentTransitionValues", inputData);
     } else {
-      currentTransitionValue = appState.automataData[i];
-    }
+      setAppState("automataData", []);
+      setAppState("currentTransitionValues", []);
+      setErrorObject(
+        `cannot have more than ${appState.stateLimit - 1} transitions`
+      );
 
-    newAutomataGraphics.createNextTransition(
-      currentTransitionValue,
-      appState.selectedObject1.xCoordinate,
-      appState.selectedObject1.yCoordinate,
-      appState.selectedObject2.xCoordinate,
-      appState.selectedObject2.yCoordinate,
-      appState.stateRadius
-    );
+      displayError();
+    }
+  } else {
+  }
+}
+
+function getCoordinates(e) {
+  setAppState("xCanvasCoordinate", e.clientX - canvasRect.x);
+  setAppState("yCanvasCoordinate", e.clientY - canvasRect.y);
+}
+
+function getInputStringData() {
+  if (isInputEmpty(inputStringData.value) === true) {
+    setErrorObject("cannot have empty input");
+    return;
+  }
+
+  let inputData = inputStringData.value;
+
+  if (validateInput("input", inputData) === true) {
+  } else {
+    setAppState("inputStringData", inputData.split(""));
+  }
+}
+
+function selectStateComponent() {
+  if (appState.component === "transition arrow") {
+    setAppState("component", "state");
+    changePlaceHolderText("Enter state name");
   }
 }
 
@@ -319,12 +312,19 @@ function selectState(e) {
   );
 }
 
-function parse() {
-  getInputStringData();
+function selectTransitionComponent() {
+  if (appState.component === "state") {
+    setAppState("component", "transition arrow");
+    changePlaceHolderText("Enter transition values");
+  }
 }
 
 function storeAutomataState(state) {
   appState.currentAutomataStates.push(state);
+}
+
+function parse() {
+  getInputStringData();
 }
 
 function submit() {
