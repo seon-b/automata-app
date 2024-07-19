@@ -13,6 +13,7 @@ const canvas = document.querySelector("#canvas");
 
 let automataData = document.querySelector("#automataData");
 let changeStateButton = document.querySelector("#changeStateButton");
+let clearCanvasButton = document.querySelector("#clearCanvas");
 let drawButton = document.querySelector("#drawButton");
 let eraseButton = document.querySelector("#eraseButton");
 let errorDisplay = document.querySelector("#errorDisplay");
@@ -20,6 +21,7 @@ let parseButton = document.querySelector("#parse");
 let stateButton = document.querySelector("#stateButton");
 let submitButton = document.querySelector("#submit");
 let transitionArrowButton = document.querySelector("#transitionArrowButton");
+let connectStatesButton = document.querySelector("#connectStatesButton");
 
 let automataDataInput = document.querySelector("#automataData");
 let inputStringData = document.querySelector("#inputStringData");
@@ -121,11 +123,13 @@ function changePlaceHolderText(text) {
 
 function clearCanvas() {
   newAutomataGraphics.clearAll();
+  setAppState("currentAutomataStates", []);
+  setAppState("currentTransitionValues", []);
+  setAppState("automataData", []);
 }
 
 function connectStates() {
-  // if (appState.currentAutomataStates === 0) return alert("No states present");
-  if (appState.currentAutomataStates === 0) {
+  if (appState.currentAutomataStates.length === 0) {
     setErrorObject("no states present");
     displayError();
     return;
@@ -211,7 +215,6 @@ function drawAutomata(e) {
       appState.yCanvasCoordinate,
       appState.stateRadius
     );
-    connectStates(appState.currentAutomataStates);
   } else if (
     appState.component === "transition arrow" &&
     appState.drawingMode === "active"
@@ -284,6 +287,7 @@ function getCoordinates(e) {
 function getInputStringData() {
   if (isInputEmpty(inputStringData.value) === true) {
     setErrorObject("cannot have empty input");
+    displayError();
     return;
   }
 
@@ -329,7 +333,6 @@ function parse() {
 
 function submit() {
   clearCanvas();
-  setAppState("automataData", []);
   getAutomataData();
 }
 
@@ -367,6 +370,8 @@ function updateCanvasRect() {
 
 canvas.addEventListener("click", drawAutomata);
 changeStateButton.addEventListener("click", toggleStateType);
+clearCanvasButton.addEventListener("click", clearCanvas);
+connectStatesButton.addEventListener("click", connectStates);
 drawButton.addEventListener("click", toggleDrawingMode);
 eraseButton.addEventListener("click", toggleEraseMode);
 parseButton.addEventListener("click", parse);
