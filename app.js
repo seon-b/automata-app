@@ -5,6 +5,7 @@ import {
   isInputEmpty,
   isValidNumberOfStates,
   isValidNumberOfTransitions,
+  isValidSymbol,
   setErrorObject,
   validateInput,
 } from "./error.js";
@@ -216,6 +217,14 @@ function drawAutomata(e) {
       return;
     }
     getCoordinates(e);
+    if (appState.currentAutomataStates.length === 0) {
+      setAppState("stateType", "start");
+    } else if (appState.stateType === "final") {
+      setAppState("stateType", "final");
+    } else {
+      setAppState("stateType", "non-final");
+    }
+
     let newState = {
       stateName: appState.stateName,
       stateType: appState.stateType,
@@ -322,8 +331,14 @@ function getCoordinates(e) {
 }
 
 function getInputStringData() {
-  if (isInputEmpty(inputStringData.value) === true) {
+  if (isInputEmpty(inputStringData.value) === false) {
     setErrorObject("cannot have empty input");
+    displayError();
+    return;
+  }
+
+  if (isValidSymbol(inputStringData.value) === false) {
+    setErrorObject("invalid input symbol");
     displayError();
     return;
   }
