@@ -13,25 +13,57 @@
     </section>
     <section class="toolbar">
       <div class="toolbarFunctions">
-        <button type="button" id="drawButton">Draw</button>
-        <button type="button" id="eraseButton">Erase</button>
-        <button type="button" id="clearCanvas">Clear Canvas</button>
-        <button type="button" id="selectStateButton">Select State</button>
-        <button type="button" id="changeStateButton">Change State Type</button>
+        <button
+          type="button"
+          id="drawButton"
+          class="buttonStyle selectedButtonStyle"
+        >
+          Draw
+        </button>
+        <button type="button" id="eraseButton" class="buttonStyle">
+          Erase
+        </button>
+        <button type="button" id="clearCanvas" class="buttonStyle">
+          Clear Canvas
+        </button>
+        <button type="button" id="selectStateButton" class="buttonStyle">
+          Select State
+        </button>
+        <button type="button" id="changeStateButton" class="buttonStyle">
+          Change State Type
+        </button>
       </div>
       <div class="toolbarAutomataComponents">
-        <button type="button" id="stateButton">State</button>
-        <button type="button" id="transitionArrowButton">
+        <button type="button" id="stateButton" class="buttonStyle">
+          State
+        </button>
+        <button
+          type="button"
+          id="transitionArrowButton"
+          class="buttonStyle selectedButtonStyle"
+        >
           Transition Arrow
         </button>
-        <button type="button" id="connectStatesButton">Connect States</button>
+        <button type="button" id="connectStatesButton" class="buttonStyle">
+          Connect States
+        </button>
       </div>
     </section>
     <section class="inputArea">
-      <input type="text" id="automataData" placeholder="Enter state name" />
-      <button type="button" id="submit">Submit</button>
-      <input type="text" id="inputStringData" placeholder="Enter symbols..." />
-      <button type="button" id="parse">Parse</button>
+      <input
+        type="text"
+        id="automataData"
+        class="buttonStyle"
+        placeholder="Enter transition values"
+      />
+      <button type="button" id="submit" class="buttonStyle">Submit</button>
+      <input
+        type="text"
+        id="inputStringData"
+        class="buttonStyle"
+        placeholder="Enter symbols..."
+      />
+      <button type="button" id="parse" class="buttonStyle">Parse</button>
     </section>
     <section class="errorArea"><p id="errorDisplay"></p></section>
 

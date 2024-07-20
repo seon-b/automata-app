@@ -11,20 +11,22 @@ import {
 
 const canvas = document.querySelector("#canvas");
 
-let automataData = document.querySelector("#automataData");
-let changeStateButton = document.querySelector("#changeStateButton");
-let clearCanvasButton = document.querySelector("#clearCanvas");
-let drawButton = document.querySelector("#drawButton");
-let eraseButton = document.querySelector("#eraseButton");
-let errorDisplay = document.querySelector("#errorDisplay");
-let parseButton = document.querySelector("#parse");
-let stateButton = document.querySelector("#stateButton");
-let submitButton = document.querySelector("#submit");
-let transitionArrowButton = document.querySelector("#transitionArrowButton");
-let connectStatesButton = document.querySelector("#connectStatesButton");
+const automataData = document.querySelector("#automataData");
+const changeStateButton = document.querySelector("#changeStateButton");
+const clearCanvasButton = document.querySelector("#clearCanvas");
+const drawButton = document.querySelector("#drawButton");
+const eraseButton = document.querySelector("#eraseButton");
+const errorDisplay = document.querySelector("#errorDisplay");
+const parseButton = document.querySelector("#parse");
+const stateButton = document.querySelector("#stateButton");
+const submitButton = document.querySelector("#submit");
+const transitionArrowButton = document.querySelector("#transitionArrowButton");
+const connectStatesButton = document.querySelector("#connectStatesButton");
 
-let automataDataInput = document.querySelector("#automataData");
-let inputStringData = document.querySelector("#inputStringData");
+const automataDataInput = document.querySelector("#automataData");
+const inputStringData = document.querySelector("#inputStringData");
+
+const buttonList = document.querySelectorAll("button");
 
 errorDisplay.style.height = "20px";
 errorDisplay.style.width = "300px";
@@ -37,7 +39,7 @@ let appState = {
   automataData: [],
   automataType: "",
   changeStateTypeButton: "Change State Type",
-  component: "state",
+  component: "transition arrow",
   currentAutomataStates: [],
   currentTransitionValues: [],
   drawButtonName: "Draw",
@@ -112,6 +114,14 @@ function setAppState(stateName, newStateValue) {
   }
 }
 
+function addSelectedButtonStyle(buttonId) {
+  buttonList.forEach((button) => {
+    if (button.id === buttonId) {
+      button.classList.add("selectedButtonStyle");
+    }
+  });
+}
+
 function changePlaceHolderText(text) {
   if (appState.component === "state") {
     automataData.getAttributeNode("placeholder").value = text;
@@ -126,6 +136,15 @@ function clearCanvas() {
   setAppState("currentAutomataStates", []);
   setAppState("currentTransitionValues", []);
   setAppState("automataData", []);
+}
+
+function clearInputField(inputField) {
+  if (inputField === "automataDataInput") {
+    automataDataInput.value = "";
+  } else if (inputField === "inputStringData") {
+    inputStringData.value = "";
+  } else {
+  }
 }
 
 function connectStates() {
@@ -246,6 +265,24 @@ function displayError() {
   }
 }
 
+function enableDrawingMode() {
+  if (appState.drawingMode === "inactive") {
+    addSelectedButtonStyle(drawButton.id);
+    removeSelectedButtonStyle(eraseButton.id);
+    setAppState("drawingMode", "active");
+    setAppState("eraseMode", "inactive");
+  }
+}
+
+function enableEraseMode() {
+  if (appState.eraseMode === "inactive") {
+    addSelectedButtonStyle(eraseButton.id);
+    removeSelectedButtonStyle(drawButton.id);
+    setAppState("eraseMode", "active");
+    setAppState("drawingMode", "inactive");
+  }
+}
+
 function getAutomataData() {
   if (isInputEmpty(automataDataInput.value) === true) {
     setErrorObject("cannot have empty input");
@@ -303,6 +340,8 @@ function selectStateComponent() {
   if (appState.component === "transition arrow") {
     setAppState("component", "state");
     changePlaceHolderText("Enter state name");
+    addSelectedButtonStyle(stateButton.id);
+    removeSelectedButtonStyle(transitionArrowButton.id);
   }
 }
 
@@ -320,6 +359,8 @@ function selectTransitionComponent() {
   if (appState.component === "state") {
     setAppState("component", "transition arrow");
     changePlaceHolderText("Enter transition values");
+    addSelectedButtonStyle(transitionArrowButton.id);
+    removeSelectedButtonStyle(stateButton.id);
   }
 }
 
@@ -329,31 +370,19 @@ function storeAutomataState(state) {
 
 function parse() {
   getInputStringData();
+  clearInputField("inputStringData");
+}
+
+function removeSelectedButtonStyle(buttonId) {
+  buttonList.forEach((button) => {
+    if (button.id === buttonId) button.classList.remove("selectedButtonStyle");
+  });
 }
 
 function submit() {
   clearCanvas();
   getAutomataData();
-}
-
-function toggleDrawingMode() {
-  if (appState.drawingMode === "active") {
-    setAppState("drawingMode", "inactive");
-    setAppState("eraseMode", "active");
-  } else {
-    setAppState("drawingMode", "active");
-    setAppState("eraseMode", "inactive");
-  }
-}
-
-function toggleEraseMode() {
-  if (appState.eraseMode === "active") {
-    setAppState("eraseMode", "inactive");
-    setAppState("drawingMode", "active");
-  } else {
-    setAppState("eraseMode", "active");
-    setAppState("drawingMode", "inactive");
-  }
+  clearInputField("automataDataInput");
 }
 
 function toggleStateType() {
@@ -372,8 +401,8 @@ canvas.addEventListener("click", drawAutomata);
 changeStateButton.addEventListener("click", toggleStateType);
 clearCanvasButton.addEventListener("click", clearCanvas);
 connectStatesButton.addEventListener("click", connectStates);
-drawButton.addEventListener("click", toggleDrawingMode);
-eraseButton.addEventListener("click", toggleEraseMode);
+drawButton.addEventListener("click", enableDrawingMode);
+eraseButton.addEventListener("click", enableEraseMode);
 parseButton.addEventListener("click", parse);
 stateButton.addEventListener("click", selectStateComponent);
 submitButton.addEventListener("click", submit);
