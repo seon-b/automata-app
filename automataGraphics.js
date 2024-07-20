@@ -38,6 +38,10 @@ export class AutomataGraphics {
       this.context.moveTo(xCoordinate - radius, yCoordinate);
       this.context.lineWidth = 1;
       this.context.lineTo(xCoordinate2 + radius, yCoordinate2);
+      this.context.lineTo(xCoordinate2 + radius, yCoordinate2);
+      this.context.lineTo(xCoordinate2 + radius + 10, yCoordinate2 - 6);
+      this.context.moveTo(xCoordinate2 + radius, yCoordinate2);
+      this.context.lineTo(xCoordinate2 + radius + 10, yCoordinate2 + 6);
       this.context.stroke();
     } else {
       this.context.beginPath();
