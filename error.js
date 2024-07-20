@@ -4,7 +4,7 @@ export let errorObject = {
 
 export function isInputEmpty(input) {
   let regExPattern = /^\s*$/;
-  if (regExPattern.test(input) === true) return regExPattern.test(input);
+  return regExPattern.test(input);
 }
 
 export function isValidNumberOfStates(numberOfStates, stateLimit) {
@@ -24,6 +24,11 @@ export function isValidNumberOfTransitions(
   } else {
     return true;
   }
+}
+
+export function isValidSymbol(input) {
+  let regExPattern = /^[A-Za-z0-9]*$/;
+  return regExPattern.test(input);
 }
 
 export function setErrorObject(message) {
