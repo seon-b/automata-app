@@ -34,10 +34,3 @@ export function isValidSymbol(input) {
 export function setErrorObject(message) {
   errorObject = { ...errorObject, errorMessage: message };
 }
-
-export function validateInput(validationType, input) {
-  if (validationType === "input") {
-    return isInputEmpty(input);
-  } else {
-  }
-}

@@ -7,7 +7,6 @@ import {
   isValidNumberOfTransitions,
   isValidSymbol,
   setErrorObject,
-  validateInput,
 } from "./error.js";
 
 const canvas = document.querySelector("#canvas");
@@ -293,7 +292,7 @@ function enableEraseMode() {
 }
 
 function getAutomataData() {
-  if (isInputEmpty(automataDataInput.value) === true) {
+  if (isInputEmpty(automataDataInput.value)) {
     setErrorObject("cannot have empty input");
     displayError();
     return;
@@ -331,24 +330,20 @@ function getCoordinates(e) {
 }
 
 function getInputStringData() {
-  if (isInputEmpty(inputStringData.value) === false) {
+  if (isInputEmpty(inputStringData.value)) {
     setErrorObject("cannot have empty input");
     displayError();
     return;
   }
 
-  if (isValidSymbol(inputStringData.value) === false) {
+  if (!isValidSymbol(inputStringData.value)) {
     setErrorObject("invalid input symbol");
     displayError();
     return;
   }
 
   let inputData = inputStringData.value;
-
-  if (validateInput("input", inputData) === true) {
-  } else {
-    setAppState("inputStringData", inputData.split(""));
-  }
+  setAppState("inputStringData", inputData.split(""));
 }
 
 function selectStateComponent() {
