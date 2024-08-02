@@ -43,7 +43,7 @@ export class AutomataGraphics {
       this.context.moveTo(xCoordinate2 + radius, yCoordinate2);
       this.context.lineTo(xCoordinate2 + radius + 10, yCoordinate2 + 6);
       this.context.stroke();
-    } else {
+    } else if (xCoordinate < xCoordinate2) {
       this.context.beginPath();
       this.context.moveTo(xCoordinate + radius, yCoordinate);
       this.context.lineWidth = 1;
@@ -52,12 +52,13 @@ export class AutomataGraphics {
       this.context.moveTo(xCoordinate2 - radius, yCoordinate2);
       this.context.lineTo(xCoordinate2 - radius - 10, yCoordinate2 - 6);
       this.context.stroke();
+    } else {
     }
 
     this.addText(
       transitionValue,
       (xCoordinate + xCoordinate2) / 2,
-      (yCoordinate + yCoordinate2) / 2
+      (yCoordinate + yCoordinate2) / 2 - 5
     );
   }
 }
