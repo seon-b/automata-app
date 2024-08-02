@@ -62,6 +62,7 @@ let appState = {
 };
 
 let newAutomataGraphics = new AutomataGraphics();
+let newFiniteAutomata = new FiniteAutomata();
 
 function setAppState(stateName, newStateValue) {
   if (stateName === "automataData") {
@@ -233,13 +234,15 @@ function drawAutomata(e) {
       isConnectedToNextState: false,
       isConnectedToPreviousState: false,
     };
+
     storeAutomataState(newState);
+    let formatObject = formatGraphics();
 
     newAutomataGraphics.createState(
       appState.stateName,
       appState.stateType,
       appState.xCanvasCoordinate,
-      appState.yCanvasCoordinate,
+      formatObject.yAxisAlignment,
       appState.stateRadius
     );
   } else if (
@@ -291,6 +294,20 @@ function enableEraseMode() {
   }
 }
 
+function formatGraphics() {
+  if (appState.currentAutomataStates[0].stateType !== "start") {
+    setErrorObject("Error,canvas is empty");
+    displayError();
+    return;
+  }
+  let formatObject = {
+    xAxisAlignment: appState.currentAutomataStates[0].xCoordinate,
+    yAxisAlignment: appState.currentAutomataStates[0].yCoordinate,
+  };
+
+  return formatObject;
+}
+
 function getAutomataData() {
   if (isInputEmpty(automataDataInput.value)) {
     setErrorObject("cannot have empty input");
@@ -302,8 +319,10 @@ function getAutomataData() {
     let inputData = automataDataInput.value.split(" ");
 
     setAppState("automataData", inputData);
+    setStateNames();
   } else if (appState.component === "transition arrow") {
     let inputData = automataDataInput.value.split("").filter((e) => e !== " ");
+    clearCanvas();
     setAppState("stateLimit", inputData.length + 1);
 
     if (
@@ -374,6 +393,39 @@ function selectTransitionComponent() {
   }
 }
 
+function setStateNames() {
+  if (appState.currentAutomataStates.length === 0) {
+    setErrorObject("No states present");
+    displayError();
+    return;
+  }
+
+  if (appState.currentAutomataStates.length < appState.stateLimit) {
+    if (appState.stateLimit === 1) {
+      setErrorObject(`Cannot have less than ${appState.stateLimit} name`);
+    } else {
+      setErrorObject(`Cannot have less than ${appState.stateLimit} names`);
+    }
+
+    displayError();
+    return;
+  }
+
+  if (appState.currentAutomataStates.length > appState.stateLimit) {
+    if (appState.stateLimit === 1) {
+      setErrorObject(`Cannot have more than ${appState.stateLimit} name`);
+    } else {
+      setErrorObject(`Cannot have more than ${appState.stateLimit} names`);
+    }
+    displayError();
+    return;
+  }
+
+  appState.currentAutomataStates.forEach(
+    (state, index) => (state.stateName = appState.automataData[index])
+  );
+}
+
 function storeAutomataState(state) {
   appState.currentAutomataStates.push(state);
 }
@@ -390,7 +442,6 @@ function removeSelectedButtonStyle(buttonId) {
 }
 
 function submit() {
-  clearCanvas();
   getAutomataData();
   clearInputField("automataDataInput");
 }
