@@ -199,6 +199,20 @@ function connectStates() {
   }
 }
 
+function displayError() {
+  if (errorObject.errorMessage !== "") {
+    errorDisplay.innerHTML = errorObject.errorMessage;
+    errorDisplay.classList.add("errorStyle");
+    updateCanvasRect();
+    setTimeout(() => {
+      setErrorObject("");
+      updateCanvasRect();
+      errorDisplay.innerHTML = errorObject.errorMessage;
+      errorDisplay.classList.remove("errorStyle");
+    }, 1000);
+  }
+}
+
 function drawAutomata(e) {
   if (
     isValidNumberOfStates(
@@ -225,7 +239,7 @@ function drawAutomata(e) {
       setAppState("stateType", "non-final");
     }
 
-    let newState = {
+    let newStartState = {
       stateName: appState.stateName,
       stateType: appState.stateType,
       xCoordinate: appState.xCanvasCoordinate,
@@ -235,15 +249,30 @@ function drawAutomata(e) {
       isConnectedToPreviousState: false,
     };
 
+    let newState = {};
+
+    if (appState.currentAutomataStates.length === 0) {
+      newState = newStartState;
+    } else {
+      newState = {
+        stateName: appState.stateName,
+        stateType: appState.stateType,
+        xCoordinate: appState.xCanvasCoordinate,
+        yCoordinate: formatGraphics().yAxisAlignment,
+        radius: appState.stateRadius,
+        isConnectedToNextState: false,
+        isConnectedToPreviousState: false,
+      };
+    }
+
     storeAutomataState(newState);
-    let formatObject = formatGraphics();
 
     newAutomataGraphics.createState(
-      appState.stateName,
-      appState.stateType,
-      appState.xCanvasCoordinate,
-      formatObject.yAxisAlignment,
-      appState.stateRadius
+      newState.stateName,
+      newState.stateType,
+      newState.xCoordinate,
+      newState.yCoordinate,
+      newState.radius
     );
   } else if (
     appState.component === "transition arrow" &&
@@ -259,20 +288,6 @@ function drawAutomata(e) {
     //   appState.selectedObject2.yCoordinate,
     //   appState.stateRadius
     // );
-  }
-}
-
-function displayError() {
-  if (errorObject.errorMessage !== "") {
-    errorDisplay.innerHTML = errorObject.errorMessage;
-    errorDisplay.classList.add("errorStyle");
-    updateCanvasRect();
-    setTimeout(() => {
-      setErrorObject("");
-      updateCanvasRect();
-      errorDisplay.innerHTML = errorObject.errorMessage;
-      errorDisplay.classList.remove("errorStyle");
-    }, 1000);
   }
 }
 
