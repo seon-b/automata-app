@@ -5,6 +5,7 @@ import {
   isInputEmpty,
   isValidNumberOfStates,
   isValidNumberOfTransitions,
+  isValidStateName,
   isValidSymbol,
   setErrorObject,
 } from "./error.js";
@@ -149,6 +150,12 @@ function clearInputField(inputField) {
 }
 
 function connectStates() {
+  if (appState.component !== "transition arrow") {
+    setErrorObject("cannot connect states in this mode");
+    displayError();
+    return;
+  }
+
   if (appState.currentAutomataStates.length === 0) {
     setErrorObject("no states present");
     displayError();
@@ -309,6 +316,23 @@ function enableEraseMode() {
   }
 }
 
+function eraseStateNames() {
+  if (appState.currentAutomataStates.length === 0) {
+    setErrorObject("No states present");
+    displayError();
+    return;
+  }
+
+  for (let i = 0; i < appState.currentAutomataStates.length; i++) {
+    newAutomataGraphics.clear(
+      appState.currentAutomataStates[i].xCoordinate,
+      appState.currentAutomataStates[i].yCoordinate,
+      45,
+      30
+    );
+  }
+}
+
 function formatGraphics() {
   if (appState.currentAutomataStates[0].stateType !== "start") {
     setErrorObject("Error,canvas is empty");
@@ -332,6 +356,13 @@ function getAutomataData() {
 
   if (appState.component === "state") {
     let inputData = automataDataInput.value.split(" ");
+    for (let i = 0; i < inputData.length; i++) {
+      if (isValidStateName(inputData[i]) === false) {
+        setErrorObject("Invalid state name");
+        displayError();
+        return;
+      }
+    }
 
     setAppState("automataData", inputData);
     setStateNames();
@@ -409,6 +440,8 @@ function selectTransitionComponent() {
 }
 
 function setStateNames() {
+  eraseStateNames();
+
   if (appState.currentAutomataStates.length === 0) {
     setErrorObject("No states present");
     displayError();
@@ -436,9 +469,14 @@ function setStateNames() {
     return;
   }
 
-  appState.currentAutomataStates.forEach(
-    (state, index) => (state.stateName = appState.automataData[index])
-  );
+  for (let i = 0; i < appState.currentAutomataStates.length; i++) {
+    appState.currentAutomataStates[i].stateName = appState.automataData[i];
+    newAutomataGraphics.addText(
+      appState.currentAutomataStates[i].stateName,
+      appState.currentAutomataStates[i].xCoordinate,
+      appState.currentAutomataStates[i].yCoordinate
+    );
+  }
 }
 
 function storeAutomataState(state) {
