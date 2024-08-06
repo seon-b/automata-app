@@ -9,12 +9,21 @@ export class AutomataGraphics {
 
   addText(text, xCoordinate, yCoordinate) {
     this.context.font = "20px serif";
-    this.context.textAlign = "right-aligned";
+    this.context.textAlign = "center";
     this.context.fillText(text, xCoordinate, yCoordinate);
   }
 
   clearAll() {
     this.context.clearRect(0, 0, canvas.width, canvas.height);
+  }
+
+  clear(startingXCoordinate, startingYCoordinate, width, height) {
+    this.context.clearRect(
+      startingXCoordinate - 20,
+      startingYCoordinate - 20,
+      width,
+      height
+    );
   }
 
   createState(name, stateType, xCoordinate, yCoordinate, radius) {
