@@ -26,6 +26,14 @@ export function isValidNumberOfTransitions(
   }
 }
 
+export function isValidStateName(stateName) {
+  if (stateName.length > 2) {
+    return false;
+  } else {
+    return true;
+  }
+}
+
 export function isValidSymbol(input) {
   let regExPattern = /^[A-Za-z0-9]*$/;
   return regExPattern.test(input);
