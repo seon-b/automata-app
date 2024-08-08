@@ -64,6 +64,7 @@ let appState = {
 
 let newAutomataGraphics = new AutomataGraphics();
 let newFiniteAutomata = new FiniteAutomata();
+newFiniteAutomata.pop();
 
 function setAppState(stateName, newStateValue) {
   if (stateName === "automataData") {
@@ -281,6 +282,14 @@ function drawAutomata(e) {
       newState.yCoordinate,
       newState.radius
     );
+
+    newFiniteAutomata.addState(
+      newState.stateName,
+      newState.radius,
+      newState.stateType,
+      newState.xCoordinate,
+      newState.yCoordinate
+    );
   } else if (
     appState.component === "transition arrow" &&
     appState.drawingMode === "active"
@@ -347,6 +356,18 @@ function formatGraphics() {
   return formatObject;
 }
 
+function generateAutomata(automataStates, transitionArrowValues) {
+  for (let i = 0; i < automataStates.length; i++) {
+    newFiniteAutomata.addState(
+      automataStates[i].stateName,
+      automataStates[i].radius,
+      automataStates[i].statetype,
+      automataStates[i].xCoordinate,
+      automataStates[i].yCoordinate
+    );
+  }
+}
+
 function getAutomataData() {
   if (isInputEmpty(automataDataInput.value)) {
     setErrorObject("cannot have empty input");
@@ -369,6 +390,7 @@ function getAutomataData() {
   } else if (appState.component === "transition arrow") {
     let inputData = automataDataInput.value.split("").filter((e) => e !== " ");
     clearCanvas();
+    newFiniteAutomata.clearAutomata();
     setAppState("stateLimit", inputData.length + 1);
 
     if (
