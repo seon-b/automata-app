@@ -1,7 +1,7 @@
 class State {
-  constructor(name = "undefined", type = "non-final") {
+  constructor(name = "", radius, type = "non-final", xCoordinate, yCoordinate) {
     this.name = name;
-    this.type = type;
+    this.radius = radius;
     this.transitionArrow = {
       nextState: null,
       presentState: null,
@@ -10,12 +10,22 @@ class State {
       presentTransitionValue: undefined,
       previousTransitionValue: undefined,
     };
+    this.type = type;
+    this.xCoordinate = xCoordinate;
+    this.yCoordinate = yCoordinate;
   }
 }
 
 export default class FiniteAutomata {
-  constructor(name = "undefined", automataType = "DFA") {
-    let newState = new State(name);
+  constructor(
+    automataType = "DFA",
+    name = "",
+    radius,
+    type = "non-final",
+    xCoordinate,
+    yCoordinate
+  ) {
+    let newState = new State(name, radius, type, xCoordinate, yCoordinate);
     this.startState = newState;
     this.lastState = newState;
     this.length = 1;
@@ -23,8 +33,8 @@ export default class FiniteAutomata {
     return this;
   }
 
-  addState(name) {
-    let newState = new State(name);
+  addState(name = "", radius, type = "non-final", xCoordinate, yCoordinate) {
+    let newState = new State(name, radius, type, xCoordinate, yCoordinate);
 
     if (!this.startState) {
       this.startState = newState;
@@ -36,6 +46,13 @@ export default class FiniteAutomata {
       this.length++;
     }
 
+    return this;
+  }
+
+  clearAutomata() {
+    while (this.startState) {
+      this.pop();
+    }
     return this;
   }
 
