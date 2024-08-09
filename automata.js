@@ -85,6 +85,27 @@ export default class FiniteAutomata {
     return -1;
   }
 
+  findStateByCoordinates(xCoordinate, yCoordinate) {
+    if (!this.startState) return undefined;
+
+    let index = 0;
+
+    let currentState = this.startState;
+
+    while (currentState !== null) {
+      if (
+        currentState.xCoordinate === xCoordinate &&
+        currentState.yCoordinate === yCoordinate
+      ) {
+        return index;
+      }
+      currentState = currentState.transitionArrow.nextState;
+      index++;
+    }
+
+    return -1;
+  }
+
   getAllStates() {
     if (!this.startState) return "No Data";
 
@@ -132,6 +153,13 @@ export default class FiniteAutomata {
 
       return currentState;
     }
+  }
+
+  getStateName(xCoordinate, yCoordinate) {
+    let index = this.findStateByCoordinates(xCoordinate, yCoordinate);
+    let stateName = this.getState(index);
+
+    return stateName.name;
   }
 
   isFinalState(stateName) {
@@ -240,6 +268,12 @@ export default class FiniteAutomata {
     let index = this.findState(stateName);
     let state = this.getState(index);
     state.transitionArrow.previousTransitionValue = value;
+  }
+
+  setStateName(xCoordinate, yCoordinate, newStateName = "q") {
+    let index = this.findStateByCoordinates(xCoordinate, yCoordinate);
+    let state = this.getState(index);
+    state.name = newStateName;
   }
 
   parse(inputString) {
