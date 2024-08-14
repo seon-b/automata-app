@@ -48,16 +48,17 @@ let appState = {
   drawingMode: "active",
   eraseMode: "inactive",
   inputStringData: [],
-  stateButtonName: "Final State",
-  transitionArrowButtonName: "Transition Arrow",
-  stateName: "",
-  stateRadius: 40,
-  stateType: "non-final",
-  stateLimit: 5,
+  parsedString: "",
   selectedObject1: { xCoordinate: undefined, yCoordinate: undefined },
   selectedObject2: { xCoordinate: undefined, yCoordinate: undefined },
   selectStateButtonName: "Select State",
+  stateButtonName: "Final State",
+  stateLimit: 5,
+  stateName: "",
+  stateRadius: 40,
+  stateType: "non-final",
   symbols: "",
+  transitionArrowButtonName: "Transition Arrow",
   xCanvasCoordinate: canvasRect.x,
   yCanvasCoordinate: canvasRect.y,
 };
@@ -89,26 +90,28 @@ function setAppState(stateName, newStateValue) {
     appState = { ...appState, eraseMode: newStateValue };
   } else if (stateName === "inputStringData") {
     appState = { ...appState, inputStringData: newStateValue };
-  } else if (stateName === "stateButtonName") {
-    appState = { ...appState, stateButtonName: newStateValue };
-  } else if (stateName === "transitionArrowButtonName") {
-    appState = { ...appState, transitionArrowButtonName: newStateValue };
-  } else if (stateName === "stateName") {
-    appState = { ...appState, stateName: newStateValue };
-  } else if (stateName === "stateRadius") {
-    appState = { ...appState, stateRadius: newStateValue };
-  } else if (stateName === "stateType") {
-    appState = { ...appState, stateType: newStateValue };
-  } else if (stateName === "stateLimit") {
-    appState = { ...appState, stateLimit: newStateValue };
+  } else if (stateName === "parsedString") {
+    appState = { ...appState, parsedString: newStateValue };
   } else if (stateName === "selectedObject1") {
     appState = { ...appState, selectedObject1: newStateValue };
   } else if (stateName === "selectedObject2") {
     appState = { ...appState, selectedObject2: newStateValue };
   } else if (stateName === "selectStateButtonName") {
     appState = { ...appState, selectStateButtonName: newStateValue };
+  } else if (stateName === "stateButtonName") {
+    appState = { ...appState, stateButtonName: newStateValue };
+  } else if (stateName === "stateLimit") {
+    appState = { ...appState, stateLimit: newStateValue };
+  } else if (stateName === "stateName") {
+    appState = { ...appState, stateName: newStateValue };
+  } else if (stateName === "stateRadius") {
+    appState = { ...appState, stateRadius: newStateValue };
+  } else if (stateName === "stateType") {
+    appState = { ...appState, stateType: newStateValue };
   } else if (stateName === "symbols") {
     appState = { ...appState, symbols: newStateValue };
+  } else if (stateName === "transitionArrowButtonName") {
+    appState = { ...appState, transitionArrowButtonName: newStateValue };
   } else if (stateName === "xCanvasCoordinate") {
     appState = { ...appState, xCanvasCoordinate: newStateValue };
   } else if (stateName === "yCanvasCoordinate") {
@@ -184,26 +187,35 @@ function connectStates() {
 
     currentObject.xCoordinate = appState.currentAutomataStates[i].xCoordinate;
     currentObject.yCoordinate = appState.currentAutomataStates[i].yCoordinate;
-    nextObject.xCoordinate = appState.currentAutomataStates[i + 1].xCoordinate;
-    nextObject.yCoordinate = appState.currentAutomataStates[i + 1].yCoordinate;
+
+    if (i === appState.currentAutomataStates.length - 1) {
+    } else {
+      nextObject.xCoordinate =
+        appState.currentAutomataStates[i + 1].xCoordinate;
+      nextObject.yCoordinate =
+        appState.currentAutomataStates[i + 1].yCoordinate;
+    }
 
     setAppState("selectedObject1", currentObject);
     setAppState("selectedObject2", nextObject);
 
-    if (appState.automataData.length === 0) {
+    if (appState.currentTransitionValues.length === 0) {
       currentTransitionValue = "";
     } else {
-      currentTransitionValue = appState.automataData[i];
+      currentTransitionValue = appState.currentTransitionValues[i];
     }
 
-    newAutomataGraphics.createNextTransition(
-      currentTransitionValue,
-      appState.selectedObject1.xCoordinate,
-      appState.selectedObject1.yCoordinate,
-      appState.selectedObject2.xCoordinate,
-      appState.selectedObject2.yCoordinate,
-      appState.stateRadius
-    );
+    if (i === appState.currentAutomataStates.length - 1) {
+    } else {
+      newAutomataGraphics.createNextTransition(
+        currentTransitionValue,
+        appState.selectedObject1.xCoordinate,
+        appState.selectedObject1.yCoordinate,
+        appState.selectedObject2.xCoordinate,
+        appState.selectedObject2.yCoordinate,
+        appState.stateRadius
+      );
+    }
   }
 }
 
@@ -289,6 +301,12 @@ function drawAutomata(e) {
       newState.stateType,
       newState.xCoordinate,
       newState.yCoordinate
+    );
+
+    newFiniteAutomata.setStateName(
+      newState.xCoordinate,
+      newState.yCoordinate,
+      newState.stateName
     );
   } else if (
     appState.component === "transition arrow" &&
@@ -396,7 +414,6 @@ function getAutomataData() {
     if (
       isValidNumberOfTransitions(inputData.length, appState.stateLimit) === true
     ) {
-      setAppState("automataData", inputData);
       setAppState("currentTransitionValues", inputData);
     } else {
       setAppState("automataData", []);
@@ -470,6 +487,12 @@ function setStateNames() {
     return;
   }
 
+  if (appState.areTransitionValuesSet === true) {
+    setErrorObject("");
+    displayError();
+    return;
+  }
+
   if (appState.currentAutomataStates.length < appState.stateLimit) {
     if (appState.stateLimit === 1) {
       setErrorObject(`Cannot have less than ${appState.stateLimit} name`);
@@ -506,6 +529,12 @@ function storeAutomataState(state) {
 }
 
 function parse() {
+  if (appState.currentAutomataStates.length === 0) {
+    setErrorObject("No states present");
+    displayError();
+    return;
+  }
+
   getInputStringData();
   clearInputField("inputStringData");
 }
