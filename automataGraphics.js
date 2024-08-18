@@ -27,7 +27,7 @@ export class AutomataGraphics {
   }
 
   createState(name, stateType, xCoordinate, yCoordinate, radius) {
-    if (stateType === "final") this.context.lineWidth = 5;
+    if (stateType === "final") this.context.lineWidth = 3;
     if (stateType === "non-final") this.context.lineWidth = 1;
     this.context.beginPath();
     this.context.arc(xCoordinate, yCoordinate, radius, 0, Math.PI * 2, false);
