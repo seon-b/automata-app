@@ -583,6 +583,7 @@ function parse() {
 
   setAppState("parsedString", appState.inputStringData);
   clearInputField("inputStringData");
+  newFiniteAutomata.parse(appState.parsedString);
 }
 
 function removeSelectedButtonStyle(buttonId) {
