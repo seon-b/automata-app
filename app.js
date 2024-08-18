@@ -521,6 +521,12 @@ function setStateNames() {
       appState.currentAutomataStates[i].xCoordinate,
       appState.currentAutomataStates[i].yCoordinate
     );
+
+    newFiniteAutomata.setStateName(
+      appState.currentAutomataStates[i].xCoordinate,
+      appState.currentAutomataStates[i].yCoordinate,
+      appState.currentAutomataStates[i].stateName
+    );
   }
 }
 
@@ -534,8 +540,9 @@ function parse() {
     displayError();
     return;
   }
-
   getInputStringData();
+
+  setAppState("parsedString", appState.inputStringData);
   clearInputField("inputStringData");
 }
 
