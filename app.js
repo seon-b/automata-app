@@ -206,6 +206,13 @@ function connectStates() {
     }
 
     if (i === appState.currentAutomataStates.length - 1) {
+      let tempName = "q" + i;
+
+      newAutomataGraphics.addText(
+        tempName,
+        appState.currentAutomataStates[i].xCoordinate,
+        appState.currentAutomataStates[i].yCoordinate
+      );
     } else {
       newAutomataGraphics.createNextTransition(
         currentTransitionValue,
@@ -214,6 +221,14 @@ function connectStates() {
         appState.selectedObject2.xCoordinate,
         appState.selectedObject2.yCoordinate,
         appState.stateRadius
+      );
+
+      let tempName = "q" + i;
+
+      newAutomataGraphics.addText(
+        tempName,
+        appState.currentAutomataStates[i].xCoordinate,
+        appState.currentAutomataStates[i].yCoordinate
       );
     }
   }
@@ -516,11 +531,22 @@ function setStateNames() {
 
   for (let i = 0; i < appState.currentAutomataStates.length; i++) {
     appState.currentAutomataStates[i].stateName = appState.automataData[i];
-    newAutomataGraphics.addText(
-      appState.currentAutomataStates[i].stateName,
-      appState.currentAutomataStates[i].xCoordinate,
-      appState.currentAutomataStates[i].yCoordinate
-    );
+
+    if (appState.currentAutomataStates[i].stateName === "") {
+      let tempName = "q" + i;
+
+      newAutomataGraphics.addText(
+        tempName,
+        appState.currentAutomataStates[i].xCoordinate,
+        appState.currentAutomataStates[i].yCoordinate
+      );
+    } else {
+      newAutomataGraphics.addText(
+        appState.currentAutomataStates[i].stateName,
+        appState.currentAutomataStates[i].xCoordinate,
+        appState.currentAutomataStates[i].yCoordinate
+      );
+    }
 
     newFiniteAutomata.setStateName(
       appState.currentAutomataStates[i].xCoordinate,

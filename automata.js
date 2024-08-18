@@ -271,9 +271,15 @@ export default class FiniteAutomata {
   }
 
   setStateName(xCoordinate, yCoordinate, newStateName = "q") {
-    let index = this.findStateByCoordinates(xCoordinate, yCoordinate);
-    let state = this.getState(index);
-    state.name = newStateName;
+    if (newStateName === "") {
+      let index = this.findStateByCoordinates(xCoordinate, yCoordinate);
+      let state = this.getState(index);
+      state.name = "q" + index;
+    } else {
+      let index = this.findStateByCoordinates(xCoordinate, yCoordinate);
+      let state = this.getState(index);
+      state.name = newStateName;
+    }
   }
 
   parse(inputString) {
