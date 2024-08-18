@@ -288,6 +288,19 @@ function drawAutomata(e) {
 
     if (appState.currentAutomataStates.length === 0) {
       newState = newStartState;
+    } else if (
+      appState.currentAutomataStates.length ===
+      appState.stateLimit - 1
+    ) {
+      newState = {
+        stateName: appState.stateName,
+        stateType: "final",
+        xCoordinate: appState.xCanvasCoordinate,
+        yCoordinate: formatGraphics().yAxisAlignment,
+        radius: appState.stateRadius,
+        isConnectedToNextState: false,
+        isConnectedToPreviousState: false,
+      };
     } else {
       newState = {
         stateName: appState.stateName,
