@@ -213,6 +213,8 @@ function connectStates() {
         appState.currentAutomataStates[i].xCoordinate,
         appState.currentAutomataStates[i].yCoordinate
       );
+
+      newFiniteAutomata.toggleStateType(tempName);
     } else {
       newAutomataGraphics.createNextTransition(
         currentTransitionValue,
@@ -268,8 +270,6 @@ function drawAutomata(e) {
     getCoordinates(e);
     if (appState.currentAutomataStates.length === 0) {
       setAppState("stateType", "start");
-    } else if (appState.stateType === "final") {
-      setAppState("stateType", "final");
     } else {
       setAppState("stateType", "non-final");
     }
