@@ -213,8 +213,6 @@ function connectStates() {
         appState.currentAutomataStates[i].xCoordinate,
         appState.currentAutomataStates[i].yCoordinate
       );
-
-      newFiniteAutomata.toggleStateType(tempName);
     } else {
       newAutomataGraphics.createNextTransition(
         currentTransitionValue,
@@ -268,6 +266,7 @@ function drawAutomata(e) {
       return;
     }
     getCoordinates(e);
+
     if (appState.currentAutomataStates.length === 0) {
       setAppState("stateType", "start");
     } else {
@@ -583,6 +582,7 @@ function parse() {
 
   setAppState("parsedString", appState.inputStringData);
   clearInputField("inputStringData");
+
   newFiniteAutomata.parse(appState.parsedString);
 }
 

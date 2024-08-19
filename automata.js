@@ -1,5 +1,11 @@
 class State {
-  constructor(name = "", radius, type = "non-final", xCoordinate, yCoordinate) {
+  constructor(
+    name = "",
+    radius,
+    stateType = "non-final",
+    xCoordinate,
+    yCoordinate
+  ) {
     this.name = name;
     this.radius = radius;
     this.transitionArrow = {
@@ -10,7 +16,7 @@ class State {
       presentTransitionValue: undefined,
       previousTransitionValue: undefined,
     };
-    this.type = type;
+    this.stateType = stateType;
     this.xCoordinate = xCoordinate;
     this.yCoordinate = yCoordinate;
   }
@@ -21,11 +27,11 @@ export default class FiniteAutomata {
     automataType = "DFA",
     name = "",
     radius,
-    type = "non-final",
+    stateType = "non-final",
     xCoordinate,
     yCoordinate
   ) {
-    let newState = new State(name, radius, type, xCoordinate, yCoordinate);
+    let newState = new State(name, radius, stateType, xCoordinate, yCoordinate);
     this.startState = newState;
     this.lastState = newState;
     this.length = 1;
@@ -33,8 +39,14 @@ export default class FiniteAutomata {
     return this;
   }
 
-  addState(name = "", radius, type = "non-final", xCoordinate, yCoordinate) {
-    let newState = new State(name, radius, type, xCoordinate, yCoordinate);
+  addState(
+    name = "",
+    radius,
+    stateType = "non-final",
+    xCoordinate,
+    yCoordinate
+  ) {
+    let newState = new State(name, radius, stateType, xCoordinate, yCoordinate);
 
     if (!this.startState) {
       this.startState = newState;
@@ -165,7 +177,7 @@ export default class FiniteAutomata {
   isFinalState(stateName) {
     let index = this.findState(stateName);
     let currentState = this.getState(index);
-    return currentState.type === "final";
+    return currentState.stateType === "final";
   }
 
   removeNextTransitionValue(stateName) {
@@ -326,10 +338,10 @@ export default class FiniteAutomata {
     let index = this.findState(stateName);
     let state = this.getState(index);
 
-    if (state.type === "non-final") {
-      state.type = "final";
+    if (state.stateType === "non-final") {
+      state.stateType = "final";
     } else {
-      state.type = "non-final";
+      state.stateType = "non-final";
     }
   }
 
