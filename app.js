@@ -1,14 +1,14 @@
 import FiniteAutomata from "./automata.js";
 import { AutomataGraphics } from "./automataGraphics.js";
 import {
-  errorObject,
+  messageObject,
   isInputEmpty,
   isValidNumberOfStates,
   isValidNumberOfTransitions,
   isValidStateName,
   isValidSymbol,
-  setErrorObject,
-} from "./error.js";
+  setMessageObject,
+} from "./message.js";
 
 const canvas = document.querySelector("#canvas");
 
@@ -17,7 +17,7 @@ const changeStateButton = document.querySelector("#changeStateButton");
 const clearCanvasButton = document.querySelector("#clearCanvas");
 const drawButton = document.querySelector("#drawButton");
 const eraseButton = document.querySelector("#eraseButton");
-const errorDisplay = document.querySelector("#errorDisplay");
+const messageDisplay = document.querySelector("#messageDisplay");
 const parseButton = document.querySelector("#parse");
 const stateButton = document.querySelector("#stateButton");
 const submitButton = document.querySelector("#submit");
@@ -29,10 +29,10 @@ const inputStringData = document.querySelector("#inputStringData");
 
 const buttonList = document.querySelectorAll("button");
 
-errorDisplay.style.height = "20px";
-errorDisplay.style.width = "300px";
-errorDisplay.style.padding = "10px";
-errorDisplay.style.border = "2px";
+messageDisplay.style.height = "20px";
+messageDisplay.style.width = "300px";
+messageDisplay.style.padding = "10px";
+messageDisplay.style.border = "2px";
 
 let canvasRect = canvas.getBoundingClientRect();
 
@@ -155,13 +155,13 @@ function clearInputField(inputField) {
 
 function connectStates() {
   if (appState.component !== "transition arrow") {
-    setErrorObject("cannot connect states in this mode");
+    setMessageObject("error", "cannot connect states in this mode");
     displayError();
     return;
   }
 
   if (appState.currentAutomataStates.length === 0) {
-    setErrorObject("no states present");
+    setMessageObject("error", "no states present");
     displayError();
     return;
   }
@@ -249,15 +249,15 @@ function connectStates() {
 }
 
 function displayError() {
-  if (errorObject.errorMessage !== "") {
-    errorDisplay.innerHTML = errorObject.errorMessage;
-    errorDisplay.classList.add("errorStyle");
+  if (messageObject.errorMessage !== "") {
+    messageDisplay.innerHTML = messageObject.errorMessage;
+    messageDisplay.classList.add("errorStyle");
     updateCanvasRect();
     setTimeout(() => {
-      setErrorObject("");
+      setMessageObject("error", "");
       updateCanvasRect();
-      errorDisplay.innerHTML = errorObject.errorMessage;
-      errorDisplay.classList.remove("errorStyle");
+      messageDisplay.innerHTML = messageObject.errorMessage;
+      messageDisplay.classList.remove("errorStyle");
     }, 1000);
   }
 }
@@ -269,13 +269,19 @@ function drawAutomata(e) {
       appState.stateLimit
     ) === false
   ) {
-    setErrorObject(`Cannot create more than ${appState.stateLimit} states`);
+    setMessageObject(
+      "error",
+      `Cannot create more than ${appState.stateLimit} states`
+    );
     displayError();
     return;
   }
   if (appState.component === "state" && appState.drawingMode === "active") {
     if (appState.currentTransitionValues.length === 0) {
-      setErrorObject("cannot create state without transition values");
+      setMessageObject(
+        "error",
+        "cannot create state without transition values"
+      );
       displayError();
       return;
     }
@@ -386,7 +392,7 @@ function enableEraseMode() {
 
 function eraseStateNames() {
   if (appState.currentAutomataStates.length === 0) {
-    setErrorObject("No states present");
+    setMessageObject("error", "No states present");
     displayError();
     return;
   }
@@ -403,7 +409,7 @@ function eraseStateNames() {
 
 function formatGraphics() {
   if (appState.currentAutomataStates[0].stateType !== "start") {
-    setErrorObject("Error,canvas is empty");
+    setMessageObject("error", "Error,canvas is empty");
     displayError();
     return;
   }
@@ -429,7 +435,7 @@ function generateAutomata(automataStates, transitionArrowValues) {
 
 function getAutomataData() {
   if (isInputEmpty(automataDataInput.value)) {
-    setErrorObject("cannot have empty input");
+    setMessageObject("error", "cannot have empty input");
     displayError();
     return;
   }
@@ -438,7 +444,7 @@ function getAutomataData() {
     let inputData = automataDataInput.value.split(" ");
     for (let i = 0; i < inputData.length; i++) {
       if (isValidStateName(inputData[i]) === false) {
-        setErrorObject("Invalid state name");
+        setMessageObject("error", "Invalid state name");
         displayError();
         return;
       }
@@ -459,7 +465,8 @@ function getAutomataData() {
     } else {
       setAppState("automataData", []);
       setAppState("currentTransitionValues", []);
-      setErrorObject(
+      setMessageObject(
+        "error",
         `cannot have more than ${appState.stateLimit - 1} transitions`
       );
 
@@ -476,13 +483,13 @@ function getCoordinates(e) {
 
 function getInputStringData() {
   if (isInputEmpty(inputStringData.value)) {
-    setErrorObject("cannot have empty input");
+    setMessageObject("error", "cannot have empty input");
     displayError();
     return;
   }
 
   if (!isValidSymbol(inputStringData.value)) {
-    setErrorObject("invalid input symbol");
+    setMessageObject("error", "invalid input symbol");
     displayError();
     return;
   }
@@ -523,22 +530,28 @@ function setStateNames() {
   eraseStateNames();
 
   if (appState.currentAutomataStates.length === 0) {
-    setErrorObject("No states present");
+    setMessageObject("error", "No states present");
     displayError();
     return;
   }
 
   if (appState.areTransitionValuesSet === true) {
-    setErrorObject("");
+    setMessageObject("error", "");
     displayError();
     return;
   }
 
   if (appState.currentAutomataStates.length < appState.stateLimit) {
     if (appState.stateLimit === 1) {
-      setErrorObject(`Cannot have less than ${appState.stateLimit} name`);
+      setMessageObject(
+        "error",
+        `Cannot have less than ${appState.stateLimit} name`
+      );
     } else {
-      setErrorObject(`Cannot have less than ${appState.stateLimit} names`);
+      setMessageObject(
+        "error",
+        `Cannot have less than ${appState.stateLimit} names`
+      );
     }
 
     displayError();
@@ -547,9 +560,15 @@ function setStateNames() {
 
   if (appState.currentAutomataStates.length > appState.stateLimit) {
     if (appState.stateLimit === 1) {
-      setErrorObject(`Cannot have more than ${appState.stateLimit} name`);
+      setMessageObject(
+        "error",
+        `Cannot have more than ${appState.stateLimit} name`
+      );
     } else {
-      setErrorObject(`Cannot have more than ${appState.stateLimit} names`);
+      setMessageObject(
+        "error",
+        `Cannot have more than ${appState.stateLimit} names`
+      );
     }
     displayError();
     return;
@@ -588,7 +607,7 @@ function storeAutomataState(state) {
 
 function parse() {
   if (appState.currentAutomataStates.length === 0) {
-    setErrorObject("No states present");
+    setMessageObject("error", "No states present");
     displayError();
     return;
   }
