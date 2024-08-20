@@ -232,6 +232,20 @@ function connectStates() {
       );
     }
   }
+
+  let newFiniteAutomataStates = newFiniteAutomata.getAllStates();
+  let i = 0;
+
+  while (i < newFiniteAutomataStates.length - 1) {
+    if (i === newFiniteAutomataStates.length) {
+    } else {
+      newFiniteAutomata.setNextTransitionValue(
+        appState.currentTransitionValues[i],
+        newFiniteAutomataStates[i].name
+      );
+    }
+    i++;
+  }
 }
 
 function displayError() {
