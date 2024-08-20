@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="style.css" />
     <script defer type="module" src="app.js"></script>
     <script defer type="module" src="automataGraphics.js"></script>
-    <script defer type="module" src="error.js"></script>
+    <script defer type="module" src="message.js"></script>
   </head>
   <body>
     <h1>Automata App</h1>
@@ -59,7 +59,9 @@
       <input type="text" id="inputStringData" placeholder="Enter symbols..." />
       <button type="button" id="parse" class="buttonStyle">Parse</button>
     </section>
-    <section class="errorArea"><p id="errorDisplay"></p></section>
+    <section class="messageArea">
+      <p id="messageDisplay"></p>
+    </section>
 
     <canvas id="canvas" width="600" height="200"></canvas>
   </body>
