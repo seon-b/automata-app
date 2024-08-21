@@ -262,6 +262,20 @@ function displayError() {
   }
 }
 
+function displaySuccess() {
+  if (messageObject.successMessage !== "") {
+    messageDisplay.innerHTML = messageObject.successMessage;
+    messageDisplay.classList.add("successStyle");
+    updateCanvasRect();
+    setTimeout(() => {
+      setMessageObject("success", "");
+      updateCanvasRect();
+      messageDisplay.innerHTML = messageObject.successMessage;
+      messageDisplay.classList.remove("successStyle");
+    }, 1000);
+  }
+}
+
 function drawAutomata(e) {
   if (
     isValidNumberOfStates(
@@ -611,12 +625,22 @@ function parse() {
     displayError();
     return;
   }
-  getInputStringData();
 
-  setAppState("parsedString", appState.inputStringData);
+  getInputStringData();
   clearInputField("inputStringData");
 
-  newFiniteAutomata.parse(appState.parsedString);
+  setAppState("parsedString", appState.inputStringData);
+
+  if (newFiniteAutomata.parse(appState.parsedString) === true) {
+    setMessageObject("success", "The string is accepted");
+    displaySuccess();
+    appState.parsedString = "";
+  } else {
+    setMessageObject("success", "The string is not accepted");
+    displaySuccess();
+    appState.parsedString = "";
+  }
+  setAppState("parsedString", "");
 }
 
 function removeSelectedButtonStyle(buttonId) {
