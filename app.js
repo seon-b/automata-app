@@ -495,23 +495,6 @@ function getCoordinates(e) {
   setAppState("yCanvasCoordinate", e.clientY - canvasRect.y);
 }
 
-function getInputStringData() {
-  if (isInputEmpty(inputStringData.value)) {
-    setMessageObject("error", "cannot have empty input");
-    displayError();
-    return;
-  }
-
-  if (!isValidSymbol(inputStringData.value)) {
-    setMessageObject("error", "invalid input symbol");
-    displayError();
-    return;
-  }
-
-  let inputData = inputStringData.value;
-  setAppState("inputStringData", inputData.split(""));
-}
-
 function selectStateComponent() {
   if (appState.component === "transition arrow") {
     setAppState("component", "state");
@@ -626,21 +609,30 @@ function parse() {
     return;
   }
 
-  getInputStringData();
-  clearInputField("inputStringData");
+  if (isInputEmpty(inputStringData.value)) {
+    setMessageObject("error", "cannot have empty input");
+    displayError();
+    return;
+  }
 
-  setAppState("parsedString", appState.inputStringData);
+  if (!isValidSymbol(inputStringData.value)) {
+    setMessageObject("error", "invalid input symbol");
+    displayError();
+    return;
+  }
+
+  setAppState("parsedString", inputStringData.value);
+  clearInputField("inputStringData");
 
   if (newFiniteAutomata.parse(appState.parsedString) === true) {
     setMessageObject("success", "The string is accepted");
     displaySuccess();
-    appState.parsedString = "";
   } else {
     setMessageObject("success", "The string is not accepted");
     displaySuccess();
-    appState.parsedString = "";
   }
   setAppState("parsedString", "");
+  setAppState("inputStringData", []);
 }
 
 function removeSelectedButtonStyle(buttonId) {
