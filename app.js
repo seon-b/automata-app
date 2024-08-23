@@ -404,6 +404,10 @@ function enableEraseMode() {
   }
 }
 
+function eraseStateNameByCoordinates(xCoordinate, yCoordinate) {
+  newAutomataGraphics.clear(xCoordinate, yCoordinate, 45, 30);
+}
+
 function eraseStateNames() {
   if (appState.currentAutomataStates.length === 0) {
     setMessageObject("error", "No states present");
@@ -524,8 +528,6 @@ function selectTransitionComponent() {
 }
 
 function setStateNames() {
-  eraseStateNames();
-
   if (appState.currentAutomataStates.length === 0) {
     setMessageObject("error", "No states present");
     displayError();
@@ -583,11 +585,18 @@ function setStateNames() {
         appState.currentAutomataStates[i].yCoordinate
       );
     } else {
-      newAutomataGraphics.addText(
-        appState.currentAutomataStates[i].stateName,
-        appState.currentAutomataStates[i].xCoordinate,
-        appState.currentAutomataStates[i].yCoordinate
-      );
+      if (appState.currentAutomataStates[i].stateName === undefined) {
+      } else {
+        eraseStateNameByCoordinates(
+          appState.currentAutomataStates[i].xCoordinate,
+          appState.currentAutomataStates[i].yCoordinate
+        );
+        newAutomataGraphics.addText(
+          appState.currentAutomataStates[i].stateName,
+          appState.currentAutomataStates[i].xCoordinate,
+          appState.currentAutomataStates[i].yCoordinate
+        );
+      }
     }
 
     newFiniteAutomata.setStateName(

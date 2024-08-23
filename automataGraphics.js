@@ -70,4 +70,18 @@ export class AutomataGraphics {
       (yCoordinate + yCoordinate2) / 2 - 5
     );
   }
+
+  createPresentTransition(transitionValue, xCoordinate, yCoordinate, radius) {
+    let arrowOffset = radius / 2;
+    this.context.beginPath();
+    this.context.arc(
+      xCoordinate - radius,
+      yCoordinate - (radius - 5),
+      arrowOffset,
+      0,
+      Math.PI * 0.45,
+      true
+    );
+    this.context.stroke();
+  }
 }
