@@ -3,8 +3,16 @@
 }
 
 .buttonStyle {
+  border: 2px solid;
+  border-color: white;
   border-radius: 4px;
-  padding: 2px;
+  padding: 4px;
+}
+
+.buttonStyle:hover {
+  background-color: #30c0b9;
+  border-color: #30c0b9;
+  color: white;
 }
 
 .errorStyle {
@@ -18,7 +26,7 @@
 .selectedButtonStyle {
   background-color: #3066be;
   color: white;
-  padding: 2px;
+  padding: 4px;
 }
 
 .successStyle {
