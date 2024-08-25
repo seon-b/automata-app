@@ -16,9 +16,10 @@ const automataData = document.querySelector("#automataData");
 const changeStateButton = document.querySelector("#changeStateButton");
 const clearCanvasButton = document.querySelector("#clearCanvas");
 const drawButton = document.querySelector("#drawButton");
-const eraseButton = document.querySelector("#eraseButton");
+const editButton = document.querySelector("#editButton");
 const messageDisplay = document.querySelector("#messageDisplay");
 const parseButton = document.querySelector("#parse");
+const selectStateButton = document.querySelector("#selectStateButton");
 const stateButton = document.querySelector("#stateButton");
 const submitButton = document.querySelector("#submit");
 const transitionArrowButton = document.querySelector("#transitionArrowButton");
@@ -44,13 +45,14 @@ let appState = {
   currentAutomataStates: [],
   currentTransitionValues: [],
   drawButtonName: "Draw",
-  eraseButtonName: "Erase",
+  editButtonName: "Edit",
   drawingMode: "active",
-  eraseMode: "inactive",
+  editMode: "inactive",
   inputStringData: [],
   parsedString: "",
   selectedObject1: { xCoordinate: undefined, yCoordinate: undefined },
   selectedObject2: { xCoordinate: undefined, yCoordinate: undefined },
+  selectedState: {},
   selectStateButtonName: "Select State",
   stateButtonName: "Final State",
   stateLimit: 5,
@@ -82,12 +84,12 @@ function setAppState(stateName, newStateValue) {
     appState = { ...appState, currentTransitionValues: newStateValue };
   } else if (stateName === "drawButtonName") {
     appState = { ...appState, drawButtonName: newStateValue };
-  } else if (stateName === "eraseButtonName") {
-    appState = { ...appState, eraseButtonName: newStateValue };
+  } else if (stateName === "editButtonName") {
+    appState = { ...appState, editButtonName: newStateValue };
   } else if (stateName === "drawingMode") {
     appState = { ...appState, drawingMode: newStateValue };
-  } else if (stateName === "eraseMode") {
-    appState = { ...appState, eraseMode: newStateValue };
+  } else if (stateName === "editMode") {
+    appState = { ...appState, editMode: newStateValue };
   } else if (stateName === "inputStringData") {
     appState = { ...appState, inputStringData: newStateValue };
   } else if (stateName === "parsedString") {
@@ -96,6 +98,8 @@ function setAppState(stateName, newStateValue) {
     appState = { ...appState, selectedObject1: newStateValue };
   } else if (stateName === "selectedObject2") {
     appState = { ...appState, selectedObject2: newStateValue };
+  } else if (stateName === "selectedState") {
+    appState = { ...appState, selectedState: newStateValue };
   } else if (stateName === "selectStateButtonName") {
     appState = { ...appState, selectStateButtonName: newStateValue };
   } else if (stateName === "stateButtonName") {
@@ -373,8 +377,7 @@ function drawAutomata(e) {
     appState.component === "transition arrow" &&
     appState.drawingMode === "active"
   ) {
-    getCoordinates(e);
-
+    // getCoordinates(e);
     // newAutomataGraphics.createNextTransition(
     //   "1",
     //   appState.selectedObject1.xCoordinate,
@@ -389,17 +392,17 @@ function drawAutomata(e) {
 function enableDrawingMode() {
   if (appState.drawingMode === "inactive") {
     addSelectedButtonStyle(drawButton.id);
-    removeSelectedButtonStyle(eraseButton.id);
+    removeSelectedButtonStyle(editButton.id);
     setAppState("drawingMode", "active");
-    setAppState("eraseMode", "inactive");
+    setAppState("editMode", "inactive");
   }
 }
 
-function enableEraseMode() {
-  if (appState.eraseMode === "inactive") {
-    addSelectedButtonStyle(eraseButton.id);
+function enableEditMode() {
+  if (appState.editMode === "inactive") {
+    addSelectedButtonStyle(editButton.id);
     removeSelectedButtonStyle(drawButton.id);
-    setAppState("eraseMode", "active");
+    setAppState("editMode", "active");
     setAppState("drawingMode", "inactive");
   }
 }
@@ -508,14 +511,28 @@ function selectStateComponent() {
   }
 }
 
+function selectSelectStateComponent() {
+  if (appState.component === "transition arrow") {
+    setAppState("component", "state");
+    changePlaceHolderText("Enter state name");
+    addSelectedButtonStyle(stateButton.id);
+    removeSelectedButtonStyle(transitionArrowButton.id);
+  }
+}
+
 function selectState(e) {
-  if (appState.currentAutomataStates === 0) return;
-  let xCoordinate = e.clientX - canvasRect.x;
-  let yCoordinate = e.clientY - canvasRect.y;
-  return (
-    xCoordinate < xCoordinate + appState.stateRadius &&
-    yCoordinate < yCoordinate + appState.stateRadius
-  );
+  if (appState.currentAutomataStates.length === 0) {
+    setMessageObject("error", "No states present");
+    displayError();
+    return;
+  }
+
+  let selectedState = {
+    xCoordinate: e.clientX - canvasRect.x,
+    yCoordinate: e.clientY - canvasRect.y,
+  };
+
+  setAppState("selectedState", selectedState);
 }
 
 function selectTransitionComponent() {
@@ -672,8 +689,9 @@ changeStateButton.addEventListener("click", toggleStateType);
 clearCanvasButton.addEventListener("click", clearCanvas);
 connectStatesButton.addEventListener("click", connectStates);
 drawButton.addEventListener("click", enableDrawingMode);
-eraseButton.addEventListener("click", enableEraseMode);
+editButton.addEventListener("click", enableEditMode);
 parseButton.addEventListener("click", parse);
+selectStateButton.addEventListener("click", selectSelectStateComponent);
 stateButton.addEventListener("click", selectStateComponent);
 submitButton.addEventListener("click", submit);
 transitionArrowButton.addEventListener("click", selectTransitionComponent);
