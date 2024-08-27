@@ -132,6 +132,31 @@ export default class FiniteAutomata {
     return listOfStates;
   }
 
+  getAllStateCoordinates() {
+    let listOfStates = this.getAllStates();
+
+    let state = {
+      name: "",
+      xCoordinate: "",
+      yCoordinate: "",
+    };
+
+    let coordinatesList = [];
+
+    for (let i = 0; i < listOfStates.length; i++) {
+      state = {
+        ...state,
+        name: listOfStates[i].name,
+        xCoordinate: listOfStates[i].xCoordinate,
+        yCoordinate: listOfStates[i].yCoordinate,
+      };
+
+      coordinatesList.push(state);
+    }
+
+    return coordinatesList;
+  }
+
   getAllTransitionValues(index) {
     let currentState = this.getState(index);
     let listOfTransitionValues = [];

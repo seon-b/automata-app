@@ -281,20 +281,20 @@ function displaySuccess() {
 }
 
 function drawAutomata(e) {
-  if (
-    isValidNumberOfStates(
-      appState.currentAutomataStates.length,
-      appState.stateLimit
-    ) === false
-  ) {
-    setMessageObject(
-      "error",
-      `Cannot create more than ${appState.stateLimit} states`
-    );
-    displayError();
-    return;
-  }
   if (appState.component === "state" && appState.drawingMode === "active") {
+    if (
+      isValidNumberOfStates(
+        appState.currentAutomataStates.length,
+        appState.stateLimit
+      ) === false
+    ) {
+      setMessageObject(
+        "error",
+        `Cannot create more than ${appState.stateLimit} states`
+      );
+      displayError();
+      return;
+    }
     if (appState.currentTransitionValues.length === 0) {
       setMessageObject(
         "error",
@@ -373,6 +373,8 @@ function drawAutomata(e) {
       newState.yCoordinate,
       newState.stateName
     );
+  } else if (appState.component === "state" && appState.editMode === "active") {
+    selectState(e);
   } else if (
     appState.component === "transition arrow" &&
     appState.drawingMode === "active"
@@ -527,10 +529,21 @@ function selectState(e) {
     return;
   }
 
-  let selectedState = {
+  let currentLocation = {
     xCoordinate: e.clientX - canvasRect.x,
     yCoordinate: e.clientY - canvasRect.y,
   };
+
+  let coordinatesList = newFiniteAutomata.getAllStateCoordinates();
+
+  let selectedState = coordinatesList.find((state) => {
+    return (
+      currentLocation.xCoordinate <= state.xCoordinate + appState.stateRadius &&
+      currentLocation.xCoordinate >= state.xCoordinate - appState.stateRadius &&
+      currentLocation.yCoordinate <= state.yCoordinate + appState.stateRadius &&
+      currentLocation.yCoordinate >= state.yCoordinate - appState.stateRadius
+    );
+  });
 
   setAppState("selectedState", selectedState);
 }
