@@ -17,10 +17,17 @@ export class AutomataGraphics {
     this.context.clearRect(0, 0, canvas.width, canvas.height);
   }
 
-  clear(startingXCoordinate, startingYCoordinate, width, height) {
+  clear(
+    startingXCoordinate,
+    startingYCoordinate,
+    xCoordinateOffset,
+    yCoordinateOffset,
+    width,
+    height
+  ) {
     this.context.clearRect(
-      startingXCoordinate - 20,
-      startingYCoordinate - 20,
+      startingXCoordinate - xCoordinateOffset,
+      startingYCoordinate - yCoordinateOffset,
       width,
       height
     );
