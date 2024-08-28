@@ -19,7 +19,7 @@ const drawButton = document.querySelector("#drawButton");
 const editButton = document.querySelector("#editButton");
 const messageDisplay = document.querySelector("#messageDisplay");
 const parseButton = document.querySelector("#parse");
-const selectStateButton = document.querySelector("#selectStateButton");
+const eraseButton = document.querySelector("#eraseButton");
 const stateButton = document.querySelector("#stateButton");
 const submitButton = document.querySelector("#submit");
 const transitionArrowButton = document.querySelector("#transitionArrowButton");
@@ -49,11 +49,12 @@ let appState = {
   drawingMode: "active",
   editMode: "inactive",
   inputStringData: [],
+  objectType: "state",
   parsedString: "",
   selectedObject1: { xCoordinate: undefined, yCoordinate: undefined },
   selectedObject2: { xCoordinate: undefined, yCoordinate: undefined },
   selectedState: {},
-  selectStateButtonName: "Select State",
+  eraseButtonName: "Erase",
   stateButtonName: "Final State",
   stateLimit: 5,
   stateName: "",
@@ -92,6 +93,8 @@ function setAppState(stateName, newStateValue) {
     appState = { ...appState, editMode: newStateValue };
   } else if (stateName === "inputStringData") {
     appState = { ...appState, inputStringData: newStateValue };
+  } else if (stateName === "objectType") {
+    appState = { ...appState, objectType: newStateValue };
   } else if (stateName === "parsedString") {
     appState = { ...appState, parsedString: newStateValue };
   } else if (stateName === "selectedObject1") {
@@ -100,8 +103,8 @@ function setAppState(stateName, newStateValue) {
     appState = { ...appState, selectedObject2: newStateValue };
   } else if (stateName === "selectedState") {
     appState = { ...appState, selectedState: newStateValue };
-  } else if (stateName === "selectStateButtonName") {
-    appState = { ...appState, selectStateButtonName: newStateValue };
+  } else if (stateName === "eraseButtonName") {
+    appState = { ...appState, eraseButtonName: newStateValue };
   } else if (stateName === "stateButtonName") {
     appState = { ...appState, stateButtonName: newStateValue };
   } else if (stateName === "stateLimit") {
@@ -409,8 +412,28 @@ function enableEditMode() {
   }
 }
 
+function eraseObject() {
+  let index = newFiniteAutomata.findStateByCoordinates(
+    appState.selectedState.xCoordinate,
+    appState.selectedState.yCoordinate
+  );
+  let stateToRemove = newFiniteAutomata.getState(index);
+  if (appState.objectType === "state") {
+    newAutomataGraphics.clear(
+      stateToRemove.xCoordinate,
+      stateToRemove.yCoordinate,
+      41.5,
+      42,
+      84,
+      84
+    );
+
+    newFiniteAutomata.removeState(appState.selectedState.name);
+  }
+}
+
 function eraseStateNameByCoordinates(xCoordinate, yCoordinate) {
-  newAutomataGraphics.clear(xCoordinate, yCoordinate, 45, 30);
+  newAutomataGraphics.clear(xCoordinate, yCoordinate, 20, 20, 45, 30);
 }
 
 function eraseStateNames() {
@@ -424,6 +447,8 @@ function eraseStateNames() {
     newAutomataGraphics.clear(
       appState.currentAutomataStates[i].xCoordinate,
       appState.currentAutomataStates[i].yCoordinate,
+      20,
+      20,
       45,
       30
     );
@@ -513,15 +538,6 @@ function selectStateComponent() {
   }
 }
 
-function selectSelectStateComponent() {
-  if (appState.component === "transition arrow") {
-    setAppState("component", "state");
-    changePlaceHolderText("Enter state name");
-    addSelectedButtonStyle(stateButton.id);
-    removeSelectedButtonStyle(transitionArrowButton.id);
-  }
-}
-
 function selectState(e) {
   if (appState.currentAutomataStates.length === 0) {
     setMessageObject("error", "No states present");
@@ -546,6 +562,7 @@ function selectState(e) {
   });
 
   setAppState("selectedState", selectedState);
+  setAppState("objectType", "state");
 }
 
 function selectTransitionComponent() {
@@ -704,7 +721,7 @@ connectStatesButton.addEventListener("click", connectStates);
 drawButton.addEventListener("click", enableDrawingMode);
 editButton.addEventListener("click", enableEditMode);
 parseButton.addEventListener("click", parse);
-selectStateButton.addEventListener("click", selectSelectStateComponent);
+eraseButton.addEventListener("click", eraseObject);
 stateButton.addEventListener("click", selectStateComponent);
 submitButton.addEventListener("click", submit);
 transitionArrowButton.addEventListener("click", selectTransitionComponent);
