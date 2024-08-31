@@ -22,7 +22,9 @@ const parseButton = document.querySelector("#parse");
 const eraseButton = document.querySelector("#eraseButton");
 const stateButton = document.querySelector("#stateButton");
 const submitButton = document.querySelector("#submit");
-const transitionArrowButton = document.querySelector("#transitionArrowButton");
+const transitionValuesButton = document.querySelector(
+  "#transitionValuesButton"
+);
 const connectStatesButton = document.querySelector("#connectStatesButton");
 
 const automataDataInput = document.querySelector("#automataData");
@@ -41,7 +43,7 @@ let appState = {
   automataData: [],
   automataType: "",
   changeStateTypeButton: "Change State Type",
-  component: "transition arrow",
+  component: "transition values",
   currentAutomataStates: [],
   currentTransitionValues: [],
   drawButtonName: "Draw",
@@ -61,7 +63,7 @@ let appState = {
   stateRadius: 40,
   stateType: "non-final",
   symbols: "",
-  transitionArrowButtonName: "Transition Arrow",
+  transitionValuesButtonName: "transition values",
   xCanvasCoordinate: canvasRect.x,
   yCanvasCoordinate: canvasRect.y,
 };
@@ -117,8 +119,8 @@ function setAppState(stateName, newStateValue) {
     appState = { ...appState, stateType: newStateValue };
   } else if (stateName === "symbols") {
     appState = { ...appState, symbols: newStateValue };
-  } else if (stateName === "transitionArrowButtonName") {
-    appState = { ...appState, transitionArrowButtonName: newStateValue };
+  } else if (stateName === "transitionValuesButtonName") {
+    appState = { ...appState, transitionValuesButtonName: newStateValue };
   } else if (stateName === "xCanvasCoordinate") {
     appState = { ...appState, xCanvasCoordinate: newStateValue };
   } else if (stateName === "yCanvasCoordinate") {
@@ -138,7 +140,7 @@ function addSelectedButtonStyle(buttonId) {
 function changePlaceHolderText(text) {
   if (appState.component === "state") {
     automataData.getAttributeNode("placeholder").value = text;
-  } else if (appState.component === "transition arrow") {
+  } else if (appState.component === "transition values") {
     automataData.getAttributeNode("placeholder").value = text;
   } else {
   }
@@ -161,7 +163,7 @@ function clearInputField(inputField) {
 }
 
 function connectStates() {
-  if (appState.component !== "transition arrow") {
+  if (appState.component !== "transition values") {
     setMessageObject("error", "cannot connect states in this mode");
     displayError();
     return;
@@ -379,7 +381,7 @@ function drawAutomata(e) {
   } else if (appState.component === "state" && appState.editMode === "active") {
     selectState(e);
   } else if (
-    appState.component === "transition arrow" &&
+    appState.component === "transition values" &&
     appState.drawingMode === "active"
   ) {
     // getCoordinates(e);
@@ -429,6 +431,7 @@ function eraseObject() {
     );
 
     newFiniteAutomata.removeState(appState.selectedState.name);
+    console.log(newFiniteAutomata.getAllStates());
   }
 }
 
@@ -469,7 +472,7 @@ function formatGraphics() {
   return formatObject;
 }
 
-function generateAutomata(automataStates, transitionArrowValues) {
+function generateAutomata(automataStates, transitionValues) {
   for (let i = 0; i < automataStates.length; i++) {
     newFiniteAutomata.addState(
       automataStates[i].stateName,
@@ -500,7 +503,7 @@ function getAutomataData() {
 
     setAppState("automataData", inputData);
     setStateNames();
-  } else if (appState.component === "transition arrow") {
+  } else if (appState.component === "transition values") {
     let inputData = automataDataInput.value.split("").filter((e) => e !== " ");
     clearCanvas();
     newFiniteAutomata.clearAutomata();
@@ -530,11 +533,11 @@ function getCoordinates(e) {
 }
 
 function selectStateComponent() {
-  if (appState.component === "transition arrow") {
+  if (appState.component === "transition values") {
     setAppState("component", "state");
     changePlaceHolderText("Enter state name");
     addSelectedButtonStyle(stateButton.id);
-    removeSelectedButtonStyle(transitionArrowButton.id);
+    removeSelectedButtonStyle(transitionValuesButton.id);
   }
 }
 
@@ -567,9 +570,9 @@ function selectState(e) {
 
 function selectTransitionComponent() {
   if (appState.component === "state") {
-    setAppState("component", "transition arrow");
+    setAppState("component", "transition values");
     changePlaceHolderText("Enter transition values");
-    addSelectedButtonStyle(transitionArrowButton.id);
+    addSelectedButtonStyle(transitionValuesButton.id);
     removeSelectedButtonStyle(stateButton.id);
   }
 }
@@ -724,4 +727,4 @@ parseButton.addEventListener("click", parse);
 eraseButton.addEventListener("click", eraseObject);
 stateButton.addEventListener("click", selectStateComponent);
 submitButton.addEventListener("click", submit);
-transitionArrowButton.addEventListener("click", selectTransitionComponent);
+transitionValuesButton.addEventListener("click", selectTransitionComponent);
