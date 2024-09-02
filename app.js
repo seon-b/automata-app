@@ -56,6 +56,7 @@ let appState = {
   selectedObject1: { xCoordinate: undefined, yCoordinate: undefined },
   selectedObject2: { xCoordinate: undefined, yCoordinate: undefined },
   selectedState: {},
+  selectedTransitionArrow: {},
   eraseButtonName: "Erase",
   stateButtonName: "Final State",
   stateLimit: 5,
@@ -105,6 +106,8 @@ function setAppState(stateName, newStateValue) {
     appState = { ...appState, selectedObject2: newStateValue };
   } else if (stateName === "selectedState") {
     appState = { ...appState, selectedState: newStateValue };
+  } else if (stateName === "selectedTransitionArrow") {
+    appState = { ...appState, selectedTransitionArrow: newStateValue };
   } else if (stateName === "eraseButtonName") {
     appState = { ...appState, eraseButtonName: newStateValue };
   } else if (stateName === "stateButtonName") {
@@ -382,17 +385,8 @@ function drawAutomata(e) {
     selectState(e);
   } else if (
     appState.component === "transition values" &&
-    appState.drawingMode === "active"
+    appState.editMode === "active"
   ) {
-    // getCoordinates(e);
-    // newAutomataGraphics.createNextTransition(
-    //   "1",
-    //   appState.selectedObject1.xCoordinate,
-    //   appState.selectedObject1.yCoordinate,
-    //   appState.selectedObject2.xCoordinate,
-    //   appState.selectedObject2.yCoordinate,
-    //   appState.stateRadius
-    // );
   }
 }
 
@@ -415,10 +409,22 @@ function enableEditMode() {
 }
 
 function eraseObject() {
+  if (appState.currentAutomataStates.length === 0) {
+    setMessageObject("error", "No objects present");
+    displayError();
+    return;
+  }
   let index = newFiniteAutomata.findStateByCoordinates(
     appState.selectedState.xCoordinate,
     appState.selectedState.yCoordinate
   );
+
+  if (index === -1) {
+    setMessageObject("error", "No objects selected");
+    displayError();
+    return;
+  }
+
   let stateToRemove = newFiniteAutomata.getState(index);
   if (appState.objectType === "state") {
     newAutomataGraphics.clear(
@@ -430,8 +436,39 @@ function eraseObject() {
       84
     );
 
+    let transitionArrowToRemove =
+      newFiniteAutomata.getTransitionArrowByCoordinates(
+        stateToRemove.xCoordinate,
+        stateToRemove.yCoordinate
+      );
+
+    let distance = findDistanceBetweenObjects(
+      transitionArrowToRemove.xCoordinateStart + appState.stateRadius + 2,
+      transitionArrowToRemove.yCoordinateStart,
+      transitionArrowToRemove.xCoordinateEnd,
+      transitionArrowToRemove.yCoordinateEnd
+    );
+
+    newAutomataGraphics.clear(
+      transitionArrowToRemove.xCoordinateStart,
+      transitionArrowToRemove.yCoordinateStart,
+      0,
+      20,
+      distance,
+      26
+    );
+
     newFiniteAutomata.removeState(appState.selectedState.name);
-    console.log(newFiniteAutomata.getAllStates());
+    appState.currentAutomataStates.splice(index, 1);
+  } else if (appState.objectType === "transition arrow") {
+    newAutomataGraphics.clear(
+      appState.selectedTransitionArrow.xCoordinateStart,
+      appState.selectedTransitionArrow.yCoordinateStart,
+      0,
+      0,
+      appState.selectedTransitionArrow.xCoordinateEnd - appState.stateRadius,
+      10
+    );
   }
 }
 
@@ -456,6 +493,14 @@ function eraseStateNames() {
       30
     );
   }
+}
+
+function findDistanceBetweenObjects(x1, y1, x2, y2) {
+  let distance = 0;
+  let xComponent = Math.pow(x2 - x1, 2);
+  let yComponent = Math.pow(y2 - y1, 2);
+  distance = Math.sqrt(xComponent + yComponent);
+  return distance;
 }
 
 function formatGraphics() {
@@ -566,6 +611,27 @@ function selectState(e) {
 
   setAppState("selectedState", selectedState);
   setAppState("objectType", "state");
+}
+
+function selectTransitionArrow(e) {
+  if (appState.currentAutomataStates.length === 0) {
+    setMessageObject("error", "No states present");
+    displayError();
+    return;
+  }
+
+  let currentLocation = {
+    xCoordinate: e.clientX - canvasRect.x,
+    yCoordinate: e.clientY - canvasRect.y,
+  };
+
+  let transitionArrowList =
+    newFiniteAutomata.getAllTransitionArrowCoordinates();
+
+  let selectedTransitionArrow;
+
+  setAppState("selectedTransitionArrow", selectedTransitionArrow);
+  setAppState("objectType", "transition arrow");
 }
 
 function selectTransitionComponent() {

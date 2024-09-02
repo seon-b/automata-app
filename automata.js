@@ -157,25 +157,137 @@ export default class FiniteAutomata {
     return coordinatesList;
   }
 
+  getAllTransitionArrowCoordinates() {
+    let listOfAllCoordinates = this.getAllStateCoordinates();
+    let listOfTransitionValues = [];
+    let index;
+
+    for (let i = 0; i < listOfAllCoordinates.length; i++) {
+      index = this.findStateByCoordinates(
+        listOfAllCoordinates[i].xCoordinate,
+        listOfAllCoordinates[i].yCoordinate
+      );
+
+      listOfTransitionValues.push(this.getAllTransitionValues(index));
+    }
+
+    let transitionArrow = {
+      nextTransitionValue: "",
+      presentTransitionValue: "",
+      previousTransitionValue: "",
+      transitionArrowName: "",
+      xCoordinateStart: "",
+      xCoordinateEnd: "",
+      yCoordinateStart: "",
+      yCoordinateEnd: "",
+    };
+
+    let listOfTransitionArrowCoordinates = [];
+
+    for (let j = 0; j < listOfTransitionValues.length - 1; j++) {
+      if (j === listOfTransitionValues.length - 2) {
+        transitionArrow = {
+          ...transitionArrow,
+          transitionArrowName:
+            listOfTransitionValues[j].name +
+            "/" +
+            listOfAllCoordinates[listOfTransitionValues.length - 1].name,
+          nextTransitionValue: listOfTransitionValues[j].nextTransitionValue,
+          presentTransitionValue:
+            listOfTransitionValues[j].presentTransitionValue,
+          previousTransitionValue:
+            listOfTransitionValues[j].previousTransitionValue,
+          xCoordinateStart: listOfAllCoordinates[j].xCoordinate,
+          xCoordinateEnd: listOfAllCoordinates[j + 1].xCoordinate,
+          yCoordinateStart: listOfAllCoordinates[j].yCoordinate,
+          yCoordinateEnd: listOfAllCoordinates[j + 1].yCoordinate,
+        };
+      } else {
+        transitionArrow = {
+          ...transitionArrow,
+          transitionArrowName:
+            listOfTransitionValues[j].name +
+            "/" +
+            listOfTransitionValues[j + 1].name,
+          nextTransitionValue: listOfTransitionValues[j].nextTransitionValue,
+          presentTransitionValue:
+            listOfTransitionValues[j].presentTransitionValue,
+          previousTransitionValue:
+            listOfTransitionValues[j].previousTransitionValue,
+          xCoordinateStart: listOfAllCoordinates[j].xCoordinate,
+          xCoordinateEnd: listOfAllCoordinates[j + 1].xCoordinate,
+          yCoordinateStart: listOfAllCoordinates[j].yCoordinate,
+          yCoordinateEnd: listOfAllCoordinates[j + 1].yCoordinate,
+        };
+      }
+
+      listOfTransitionArrowCoordinates.push(transitionArrow);
+    }
+
+    return listOfTransitionArrowCoordinates;
+  }
+
   getAllTransitionValues(index) {
     let currentState = this.getState(index);
-    let listOfTransitionValues = [];
-    if (currentState.transitionArrow.nextTransitionValue !== undefined)
-      listOfTransitionValues.push(
-        currentState.transitionArrow.nextTransitionValue
-      );
 
-    if (currentState.transitionArrow.presentTransitionValue !== undefined)
-      listOfTransitionValues.push(
-        currentState.transitionArrow.presentTransitionValue
-      );
+    let transitionObject = {
+      name: "",
+      nextTransitionValue: undefined,
+      presentTransitionValue: undefined,
+      previousTransitionValue: undefined,
+    };
 
-    if (currentState.transitionArrow.previousTransitionValue !== undefined)
-      listOfTransitionValues.push(
-        currentState.transitionArrow.previousTransitionValue
-      );
+    if (currentState.transitionArrow.nextTransitionValue !== undefined) {
+      transitionObject = {
+        ...transitionObject,
+        name: currentState.name,
+        nextTransitionValue: currentState.transitionArrow.nextTransitionValue,
+      };
+    }
 
-    return listOfTransitionValues;
+    if (currentState.transitionArrow.presentTransitionValue !== undefined) {
+      transitionObject = {
+        ...transitionObject,
+        name: currentState.name,
+        nextTransitionValue:
+          currentState.transitionArrow.presentTransitionValue,
+      };
+    }
+
+    if (currentState.transitionArrow.previousTransitionValue !== undefined) {
+      transitionObject = {
+        ...transitionObject,
+        name: currentState.name,
+        nextTransitionValue:
+          currentState.transitionArrow.previousTransitionValue,
+      };
+    }
+    return transitionObject;
+  }
+
+  getTransitionArrowByName(transitionArrowName) {
+    let listOfTransitionArrowCoordinates =
+      this.getAllTransitionArrowCoordinates();
+
+    let transitionArrow = listOfTransitionArrowCoordinates.find(
+      (transitionArrow) =>
+        transitionArrow.transitionArrowName === transitionArrowName
+    );
+
+    return transitionArrow;
+  }
+
+  getTransitionArrowByCoordinates(xCoordinate, yCoordinate) {
+    let listOfTransitionArrowCoordinates =
+      this.getAllTransitionArrowCoordinates();
+
+    let transitionArrow = listOfTransitionArrowCoordinates.find(
+      (transitionArrow) =>
+        transitionArrow.xCoordinateStart === xCoordinate &&
+        transitionArrow.yCoordinateStart === yCoordinate
+    );
+
+    return transitionArrow;
   }
 
   getState(index) {
