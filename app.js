@@ -460,15 +460,17 @@ function eraseObject() {
 
     newFiniteAutomata.removeState(appState.selectedState.name);
     appState.currentAutomataStates.splice(index, 1);
-  } else if (appState.objectType === "transition arrow") {
-    newAutomataGraphics.clear(
-      appState.selectedTransitionArrow.xCoordinateStart,
-      appState.selectedTransitionArrow.yCoordinateStart,
-      0,
-      0,
-      appState.selectedTransitionArrow.xCoordinateEnd - appState.stateRadius,
-      10
-    );
+
+    // } else if (appState.objectType === "transition arrow") {
+    //   newAutomataGraphics.clear(
+    //     appState.selectedTransitionArrow.xCoordinateStart,
+    //     appState.selectedTransitionArrow.yCoordinateStart,
+    //     0,
+    //     0,
+    //     appState.selectedTransitionArrow.xCoordinateEnd - appState.stateRadius,
+    //     10
+    //   );
+    //
   }
 }
 
